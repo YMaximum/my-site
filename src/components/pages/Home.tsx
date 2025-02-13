@@ -4,6 +4,7 @@ import Sidebar from '../organisms/Sidebar';
 import RadialBackground from '../atoms/RadialBackground';
 import ExperienceCard from '../organisms/ExperienceCard';
 import { experiences } from '../../data/experiences';
+import { colors } from '../../styles/colors';
 
 interface Position {
   x: number;
@@ -30,6 +31,15 @@ const HomeContentWrapper = styled.main`
   padding: 4rem 0;
 `;
 
+const AboutSection = styled.section`
+  width: 100%;
+  margin-bottom: 4rem;
+
+  p.text {
+    color: ${colors.primaryText};
+  }
+`;
+
 const ExperiencesSection = styled.section`
   width: 100%;
   display: flex;
@@ -52,6 +62,13 @@ export default function HomePage(): React.ReactElement {
       <Container>
         <Sidebar />
         <HomeContentWrapper>
+          <AboutSection>
+            <p className='text'>
+              I craft solutions, squash bugs, and occasionally Google my own
+              errors. AI is my teacher, documentation is my mentor, and trial
+              and error is my best friend.
+            </p>
+          </AboutSection>
           <ExperiencesSection>
             {experiences.data.map((item, index) => (
               <ExperienceCard
