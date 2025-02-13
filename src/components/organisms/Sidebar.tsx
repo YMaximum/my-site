@@ -6,6 +6,9 @@ import AccountCircleIcon from '../icons/AccountCircleIcon';
 import StarIcon from '../icons/StarIcon';
 import CodeIcon from '../icons/CodeIcon';
 import MenuItem from '../molecules/MenuItem';
+import githubSvg from '../../assets/github.svg';
+import linkedinSvg from '../../assets/linkedin.svg';
+import EmailIcon from '../icons/EmailIcon';
 
 const Container = styled.aside`
   width: 100%;
@@ -54,11 +57,47 @@ const MenuWrapper = styled.nav`
   gap: 1.5rem;
 `;
 
+const EndContentWrapper = styled.div`
+  width: 100%;
+  align-self: flex-end;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+`;
+
 const SocialMediaWrapper = styled.div`
   display: flex;
   gap: 1rem;
   width: 100%;
-  align-self: flex-end;
+  align-items: center;
+
+  a {
+    all: unset;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+  }
+
+  img,
+  svg {
+    width: 25px;
+    height: 25px;
+  }
+`;
+
+const CopyrightText = styled.p`
+  span {
+    color: ${colors.secondaryText};
+
+    a {
+      text-decoration: none;
+      color: ${colors.secondaryText};
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 `;
 
 const MENU_ITEMS = [
@@ -104,9 +143,28 @@ export default function Sidebar(): React.ReactElement {
           ))}
         </MenuWrapper>
       </ProfileMenuWrapper>
-      <SocialMediaWrapper>
-        <p>social media here</p>
-      </SocialMediaWrapper>
+      <EndContentWrapper>
+        <SocialMediaWrapper>
+          <a href='https://github.com/YMaximum' target='blank'>
+            <img src={githubSvg} alt='github-logo' />
+          </a>
+          <a href='https://www.linkedin.com/in/nyassar/' target='blank'>
+            <img src={linkedinSvg} alt='linkedin-logo' />
+          </a>
+          <a href='mailto:yassarnaufal@gmail.com'>
+            <EmailIcon />
+          </a>
+        </SocialMediaWrapper>
+        <CopyrightText>
+          <span>© 2025 /</span> Naufal Yassar{' '}
+          <span>
+            /{' '}
+            <a href='https://github.com/YMaximum/my-site' target='blank'>
+              Source Code Here
+            </a>
+          </span>
+        </CopyrightText>
+      </EndContentWrapper>
     </Container>
   );
 }
