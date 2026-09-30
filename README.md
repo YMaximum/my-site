@@ -1,30 +1,44 @@
-# React + TypeScript + Vite
+# Naufal Yassar's portfolio
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A React portfolio about product ownership, full-stack delivery, and practical AI workflows. It includes selected project case studies, an interactive development workflow, experience, ongoing explorations, and contact links.
 
-Currently, two official plugins are available:
+## Run locally
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Use Node.js 22.12 or newer (Node.js 24 recommended).
 
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
-
-- Configure the top-level `parserOptions` property like this:
-
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+```sh
+npm ci
+npm run dev
 ```
 
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+## Verify
+
+```sh
+npm run lint
+npm run build
+npx playwright install chromium
+npm run test:e2e
+```
+
+The browser suite checks case-study deep links and keyboard behavior, workflow state, mobile navigation, email copying, responsive overflow, reduced motion, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
+
+## Build and host
+
+```sh
+npm run build
+npm run preview
+```
+
+The output is in `dist/` and can be served by a static host. No server, API credentials, remote font service, or account connection is required. Configure Vite's `base` when hosting below a domain subpath.
+
+## Edit the content
+
+- `src/data/portfolio.ts`: profile links, project case studies, AI workflow stages, and experience.
+- `src/App.tsx`: page sections and navigation.
+- `src/components/`: conceptual illustrations, case-study dialog, and workflow explorer.
+- `src/index.css`: layout, design tokens, typography, and responsive styles.
+- `index.html` and `public/favicon.svg`: metadata and site identity.
+
+Company work is summarized at a high level. Public project illustrations are labeled as concepts; they are not screenshots. OpenClaw and VPS automation are presented as explorations. Case studies and workflow stages support `?project=diagrams` and `?stage=review` links.
+
+The design brief is in `docs/portfolio/implementation-brief.md`. Reviewed design instructions and their pinned sources are in `.agents/skills/`.
