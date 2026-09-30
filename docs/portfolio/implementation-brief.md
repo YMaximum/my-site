@@ -50,22 +50,22 @@ Further visual survey candidates, not yet inspected: [Godly](https://godly.websi
 
 ## Visual direction
 
-**Recommended: a clear, light product portfolio.** Use broad, left-aligned typography and generous spacing. Let the flagship project's conceptual data flow and the AI workflow be the memorable visual elements. Product problems and decisions supply the character.
+**Current direction: a dark, fluid product portfolio.** The user has requested a darker palette, visible geometric movement, smooth interactive transitions, fully working controls, and a native-style case-study dialog with outside-click dismissal and a persistent close button.
 
 Compact tokens:
-- Page: cloud #F6F8FB.
-- Primary surface: white #FFFFFF.
-- Main text: ink #182338.
-- Secondary text: slate #52627A.
-- Action and focus: cobalt #2454C6.
-- Dividers: mist #DCE3ED. Dividers are decorative, not the only indicator of a control's boundary.
-- Verify actual text and control contrast during implementation; these are design intentions, not completed accessibility checks.
-- Type: Manrope for headings, chosen for a broad, legible contemporary voice; body uses a readable system sans stack. Self-host Manrope only if the font can be obtained through an authorized source; use a strong system fallback without blocking content.
-- Scale: heading 64–72px desktop / 36–42px mobile; section heading 32–40px / 28px; body 17–18px with line-height around 1.6. Keep body copy near 65 characters per line.
-- Layout: maximum width about 1180px, 24px mobile gutters, 80–112px between large desktop sections and 48–64px on mobile.
-- Use restrained 8–12px radii for diagrams and genuine grouped surfaces. Avoid putting every paragraph into an identical card.
-- No automatic typewriter loop or cursor-tracking glow. Use short user-triggered transitions and respect reduced motion.
-- Maintain stable geometry on hover. Every actionable element gets a visible keyboard focus state.
+- Page: deep navy #0B111D.
+- Primary surface: blue graphite #111C2C.
+- Main text: cool white #EDF2FA.
+- Secondary text: slate #ABB8CC.
+- Action and focus: periwinkle #9AB9FF.
+- Dividers: blue slate #2A384E.
+- Type: locally bundled Manrope, retaining the broad headings and readable line lengths.
+- Layout: retain the project-led composition, generous spacing and responsive grids. Left alignment makes the work easy to scan.
+- Motion: an orchestrated introduction, section arrivals, animated workflow changes, diagram connections, subtle geometric rotation and pointer/scroll parallax. Animate transforms and opacity where possible; pointer movement must not rerender the React tree.
+- Include a persistent pause control, honor system reduced motion, and preserve native scrolling and keyboard operation.
+- Dialog: native `showModal()` for focus trapping, Escape and focus return; animate enter/exit, dismiss after an outside pointer press and release, retain the content through exit, and use a sticky close header inside the scrolling dialog.
+
+Critique before implementation: a single bright accent on black would flatten the three projects into a generic developer template. Use restrained blue, lilac and teal diagram surfaces to distinguish their subject matter. Geometric movement extends the connections already present in the real workflow diagrams; it must remain behind the readable content and leave every control stable and usable.
 
 ### Layout comparison
 
@@ -96,7 +96,7 @@ The minimal option is simpler but gives less space to demonstrate product owners
 
 ### Critique against the brief
 
-A generic collection of equal cards would flatten the difference between substantial company work and experiments. A terminal-themed hero would prioritize decoration over product ownership. The revised design uses one flagship section, public work beneath it, and a real six-step workflow. Numbers are appropriate only for that actual sequence. The light palette is a proposal, not a stated user preference; the user can steer it before or during implementation.
+A generic collection of equal cards would flatten the difference between substantial company work and experiments. A terminal-themed hero would prioritize decoration over product ownership. The revised design uses one flagship section, public work beneath it, and a real six-step workflow. Numbers are appropriate only for that actual sequence. The initial light proposal has been superseded by the user’s explicit preference for a dark, animated design.
 
 ## Existing source findings
 
@@ -144,3 +144,11 @@ After implementation:
 7. Commit and push a feature branch to YMaximum/my-site when the user resumes the implementation-and-push work. Prefer a reviewable PR; attach any created PR to the chat. Do not merge or deploy without authorization for that step.
 
 Read .agents/skills/frontend-design/SKILL.md before implementing, then use .agents/skills/web-design-guidelines/SKILL.md for the review pass.
+
+## Dark theme and interaction verification
+
+The dark theme and motion revision passes the production build, ESLint, formatting, and all 15 Playwright browser tests. Page and dialog accessibility checks cover 1440px, 768px, 390px, and 320px. Desktop and mobile screenshots were inspected.
+
+The browser checks cover animated Escape and browser Back dismissal, outside-click dismissal without mistaking a content drag for a backdrop click, the close button after scrolling to the bottom, all three case-study actions, all six workflow stages on desktop and mobile, every navigation anchor, clipboard success and failure, and persisted motion preferences including live system preference changes. The top anchor was moved from the sticky header to the page root after the new navigation test exposed that bug.
+
+Motion uses CSS and the Web Animations API without another runtime dependency. Browser verification used Chromium; a full cross-browser matrix has not been run. GitHub-hosted checks have previously been blocked by an account billing lock; local verification is complete.

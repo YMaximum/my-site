@@ -1,21 +1,80 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../data/portfolio';
 import Icon from './Icons';
+
+function animateClose(element: HTMLDialogElement, enabled: boolean) {
+  if (!element.open || element.dataset.closing) return null;
+  if (!enabled) {
+    element.close();
+    return null;
+  }
+  element.dataset.closing = 'true';
+  const animation = element.animate(
+    [
+      { opacity: 1, transform: 'translateY(0) scale(1)' },
+      { opacity: 0, transform: 'translateY(12px) scale(0.98)' },
+    ],
+    { duration: 180, easing: 'cubic-bezier(0.4, 0, 1, 1)', fill: 'forwards' },
+  );
+  void animation.finished
+    .then(() => {
+      element.close();
+      animation.cancel();
+      delete element.dataset.closing;
+    })
+    .catch(() => {
+      delete element.dataset.closing;
+    });
+  return animation;
+}
+
+function isOutside(event: React.PointerEvent<HTMLDialogElement>) {
+  const bounds = event.currentTarget.getBoundingClientRect();
+  return (
+    event.clientX < bounds.left ||
+    event.clientX > bounds.right ||
+    event.clientY < bounds.top ||
+    event.clientY > bounds.bottom
+  );
+}
 
 export default function ProjectDialog({
   project,
   onClose,
+  motionEnabled,
 }: {
   project: Project | null;
   onClose: () => void;
+  motionEnabled: boolean;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const closingAnimation = useRef<Animation | null>(null);
+  const pointerStartedOutside = useRef(false);
+  const [displayedProject, setDisplayedProject] = useState(project);
+  // Retain the content during exit, including when browser Back clears the URL.
+  if (project && project !== displayedProject) setDisplayedProject(project);
+
+  function requestClose() {
+    const element = dialog.current;
+    if (element && !element.dataset.closing) {
+      closingAnimation.current = animateClose(element, motionEnabled);
+    }
+  }
 
   useEffect(() => {
     const element = dialog.current;
-    if (project && !element?.open) element?.showModal();
-    if (!project && element?.open) element.close();
-  }, [project]);
+    if (!element) return;
+    if (project && !element.open) {
+      element.showModal();
+      element.scrollTop = 0;
+    } else if (!project) {
+      closingAnimation.current = animateClose(element, motionEnabled);
+    }
+    return () => {
+      closingAnimation.current?.cancel();
+      closingAnimation.current = null;
+    };
+  }, [project, motionEnabled]);
 
   return (
     <dialog
@@ -23,72 +82,87 @@ export default function ProjectDialog({
       className='project-dialog'
       aria-labelledby='case-study-title'
       onClose={onClose}
+      onCancel={(event) => {
+        event.preventDefault();
+        requestClose();
+      }}
+      onPointerDown={(event) => {
+        pointerStartedOutside.current = event.button === 0 && isOutside(event);
+      }}
+      onPointerUp={(event) => {
+        if (pointerStartedOutside.current && isOutside(event)) requestClose();
+        pointerStartedOutside.current = false;
+      }}
+      onPointerCancel={() => {
+        pointerStartedOutside.current = false;
+      }}
     >
-      {project && (
-        <div className='dialog-content'>
+      {displayedProject && (
+        <>
           <div className='dialog-top'>
-            <span className='project-category'>{project.category}</span>
+            <span className='project-category'>
+              {displayedProject.category}
+            </span>
             <button
               className='icon-button dialog-close'
               aria-label='Close case study'
-              onClick={() => dialog.current?.close()}
+              onClick={requestClose}
             >
               <Icon name='X' size={22} />
             </button>
           </div>
-          <h2 id='case-study-title'>{project.title}</h2>
-          <p className='dialog-summary'>{project.summary}</p>
-          <ul className='tech-list' aria-label='Technologies'>
-            {project.technologies.map((tech) => (
-              <li key={tech}>{tech}</li>
-            ))}
-          </ul>
-          <div className='case-study-section'>
-            <h3>The problem</h3>
-            <p>{project.context}</p>
-          </div>
-          <div className='case-study-section'>
-            <h3>My contribution</h3>
-            <p>{project.contribution}</p>
-          </div>
-          <div className='case-study-section'>
-            <h3>The decisions</h3>
-            <div className='case-decisions'>
-              {project.decisions.map((decision) => (
-                <div key={decision.title}>
-                  <Icon name='Check' size={18} />
-                  <div>
-                    <h4>{decision.title}</h4>
-                    <p>{decision.description}</p>
-                  </div>
-                </div>
+          <div className='dialog-content'>
+            <h2 id='case-study-title'>{displayedProject.title}</h2>
+            <p className='dialog-summary'>{displayedProject.summary}</p>
+            <ul className='tech-list' aria-label='Technologies'>
+              {displayedProject.technologies.map((tech) => (
+                <li key={tech}>{tech}</li>
               ))}
+            </ul>
+            <div className='case-study-section'>
+              <h3>The problem</h3>
+              <p>{displayedProject.context}</p>
+            </div>
+            <div className='case-study-section'>
+              <h3>My contribution</h3>
+              <p>{displayedProject.contribution}</p>
+            </div>
+            <div className='case-study-section'>
+              <h3>The decisions</h3>
+              <div className='case-decisions'>
+                {displayedProject.decisions.map((decision) => (
+                  <div key={decision.title}>
+                    <Icon name='Check' size={18} />
+                    <div>
+                      <h4>{decision.title}</h4>
+                      <p>{decision.description}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+            <div className='case-study-section case-outcome'>
+              <h3>The result</h3>
+              <p>{displayedProject.outcome}</p>
+            </div>
+            <div className='dialog-actions'>
+              {displayedProject.repository && (
+                <a
+                  className='button button-primary'
+                  href={displayedProject.repository}
+                  target='_blank'
+                  rel='noreferrer'
+                >
+                  <Icon name='Github' size={18} /> Explore the repository{' '}
+                  <Icon name='ArrowUpRight' size={16} />
+                </a>
+              )}
+              <button className='text-button' onClick={requestClose}>
+                Back to selected work <Icon name='ArrowRight' size={17} />
+              </button>
             </div>
           </div>
-          <div className='case-study-section case-outcome'>
-            <h3>The result</h3>
-            <p>{project.outcome}</p>
-          </div>
-          <div className='dialog-actions'>
-            {project.repository && (
-              <a
-                className='button button-primary'
-                href={project.repository}
-                target='_blank'
-                rel='noreferrer'
-              >
-                <Icon name='Github' size={18} /> Explore the repository{' '}
-                <Icon name='ArrowUpRight' size={16} />
-              </a>
-            )}
-            <button
-              className='text-button'
-              onClick={() => dialog.current?.close()}
-            >
-              Back to selected work <Icon name='ArrowRight' size={17} />
-            </button>
-          </div>
-        </div>
+        </>
       )}
     </dialog>
   );

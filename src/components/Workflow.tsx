@@ -35,27 +35,29 @@ export default function Workflow({
       </ol>
       <div
         id='workflow-detail'
-        className='workflow-detail'
+        className='workflow-panel'
         aria-live='polite'
         aria-atomic='true'
       >
-        <span className='workflow-detail-label'>
-          Step {stage + 1} of {workflow.length}
-        </span>
-        <h3>{current.heading}</h3>
-        <p>{current.description}</p>
-        <div className='workflow-responsibilities'>
-          <div>
-            <span>
-              <Icon name='Target' size={16} /> My part
-            </span>
-            <p>{current.human}</p>
-          </div>
-          <div>
-            <span>
-              <Icon name='Sparkles' size={16} /> AI support
-            </span>
-            <p>{current.ai}</p>
+        <div className='workflow-detail' key={current.id}>
+          <span className='workflow-detail-label'>
+            Step {stage + 1} of {workflow.length}
+          </span>
+          <h3>{current.heading}</h3>
+          <p>{current.description}</p>
+          <div className='workflow-responsibilities'>
+            <div>
+              <span>
+                <Icon name='Target' size={16} /> My part
+              </span>
+              <p>{current.human}</p>
+            </div>
+            <div>
+              <span>
+                <Icon name='Sparkles' size={16} /> AI support
+              </span>
+              <p>{current.ai}</p>
+            </div>
           </div>
         </div>
       </div>

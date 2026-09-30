@@ -19,6 +19,14 @@ function IntegrationVisual() {
         >
           <path d='M130 100H192Q212 100 212 120V150Q212 170 232 170H300' />
           <path d='M130 240H192Q212 240 212 220V190Q212 170 232 170' />
+          <path
+            className='flow-pulse'
+            d='M130 100H192Q212 100 212 120V150Q212 170 232 170H300'
+          />
+          <path
+            className='flow-pulse'
+            d='M130 240H192Q212 240 212 220V190Q212 170 232 170H300'
+          />
         </svg>
         <div className='data-node source-node source-one'>
           <span className='node-icon'>

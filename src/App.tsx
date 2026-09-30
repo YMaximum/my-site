@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import Icon from './components/Icons';
+import MotionEffects from './components/MotionEffects';
+import { useMotionPreference } from './hooks/useMotionPreference';
 import ProjectDialog from './components/ProjectDialog';
 import ProjectVisual from './components/ProjectVisual';
 import Workflow from './components/Workflow';
@@ -25,6 +27,7 @@ function readPageState() {
 }
 
 export default function App() {
+  const { motionEnabled, reducedMotion, toggleMotion } = useMotionPreference();
   const [pageState, setPageState] = useState(readPageState);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
@@ -108,13 +111,17 @@ export default function App() {
   }
 
   return (
-    <>
+    <div
+      id='top'
+      className='portfolio'
+      data-motion={motionEnabled ? 'on' : 'off'}
+    >
+      <MotionEffects enabled={motionEnabled} />
       <a href='#main' className='skip-link'>
         Skip to content
       </a>
       <header
         className='site-header'
-        id='top'
         onKeyDown={(event) => {
           if (event.key === 'Escape' && menuOpen) {
             setMenuOpen(false);
@@ -167,6 +174,28 @@ export default function App() {
               </a>
             ))}
           </nav>
+          <button
+            className='icon-button motion-toggle'
+            onClick={toggleMotion}
+            disabled={reducedMotion}
+            aria-label={
+              reducedMotion
+                ? 'Motion reduced by your system preference'
+                : motionEnabled
+                  ? 'Pause motion'
+                  : 'Enable motion'
+            }
+            aria-pressed={motionEnabled}
+            title={
+              reducedMotion
+                ? 'Your reduced-motion preference is active'
+                : motionEnabled
+                  ? 'Pause motion'
+                  : 'Enable motion'
+            }
+          >
+            <Icon name={motionEnabled ? 'Pause' : 'Play'} size={18} />
+          </button>
           <a
             className='header-github'
             href={profile.github}
@@ -237,7 +266,7 @@ export default function App() {
           className='work-section section container'
           aria-labelledby='work-title'
         >
-          <div className='section-heading'>
+          <div className='section-heading' data-reveal>
             <div>
               <h2 id='work-title'>Selected work</h2>
               <p>Different problems. The same sense of ownership.</p>
@@ -251,7 +280,7 @@ export default function App() {
               More on GitHub <Icon name='ArrowUpRight' size={17} />
             </a>
           </div>
-          <article className='flagship-project'>
+          <article className='flagship-project' data-reveal>
             <div className='flagship-copy'>
               <span className='project-category'>{flagship.category}</span>
               <h3>{flagship.title}</h3>
@@ -280,7 +309,11 @@ export default function App() {
           </article>
           <div className='project-grid'>
             {projects.slice(1).map((project) => (
-              <article className='secondary-project' key={project.id}>
+              <article
+                className='secondary-project'
+                key={project.id}
+                data-reveal
+              >
                 <ProjectVisual project={project.id} />
                 <div className='secondary-project-copy'>
                   <span className='project-category'>{project.category}</span>
@@ -321,7 +354,7 @@ export default function App() {
           aria-labelledby='approach-title'
         >
           <div className='container'>
-            <div className='approach-intro'>
+            <div className='approach-intro' data-reveal>
               <div>
                 <span className='section-note'>
                   <Icon name='BrainCircuit' size={18} /> A better way to build
@@ -361,7 +394,7 @@ export default function App() {
           className='experience-section section container'
           aria-labelledby='experience-title'
         >
-          <div className='experience-intro'>
+          <div className='experience-intro' data-reveal>
             <h2 id='experience-title'>
               Built on experience.
               <br />
@@ -382,7 +415,11 @@ export default function App() {
           </div>
           <div className='experience-list'>
             {experiences.map((experience, index) => (
-              <article className='experience-item' key={experience.company}>
+              <article
+                className='experience-item'
+                key={experience.company}
+                data-reveal
+              >
                 <div
                   className={`experience-marker ${index === 0 ? 'is-current' : ''}`}
                   aria-hidden='true'
@@ -406,6 +443,7 @@ export default function App() {
         <section
           className='exploring-section container'
           aria-labelledby='exploring-title'
+          data-reveal
         >
           <div className='exploring-heading'>
             <span className='exploring-icon'>
@@ -447,7 +485,7 @@ export default function App() {
           className='contact-section section container'
           aria-labelledby='contact-title'
         >
-          <div className='contact-heading'>
+          <div className='contact-heading' data-reveal>
             <span className='section-note'>Keep the conversation going</span>
             <h2 id='contact-title'>
               Let's build
@@ -504,7 +542,11 @@ export default function App() {
           Back to top <Icon name='ArrowUp' size={16} />
         </a>
       </footer>
-      <ProjectDialog project={selectedProject} onClose={closeProject} />
-    </>
+      <ProjectDialog
+        project={selectedProject}
+        onClose={closeProject}
+        motionEnabled={motionEnabled}
+      />
+    </div>
   );
 }
