@@ -47,6 +47,9 @@ export default function MotionEffects({ enabled }: { enabled: boolean }) {
       background?.style.setProperty('--pointer-y', '0px');
     }
 
+    const headerHeight = getComputedStyle(document.documentElement)
+      .getPropertyValue('--header-height')
+      .trim();
     const observer = new IntersectionObserver(
       (entries) =>
         entries.forEach((entry) => {
@@ -54,7 +57,7 @@ export default function MotionEffects({ enabled }: { enabled: boolean }) {
           entry.target.classList.add('is-revealed');
           observer.unobserve(entry.target);
         }),
-      { threshold: 0.08 },
+      { threshold: 0.08, rootMargin: `-${headerHeight} 0px 0px 0px` },
     );
     document
       .querySelectorAll('[data-reveal]')

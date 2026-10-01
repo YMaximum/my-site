@@ -6,7 +6,8 @@ export const profile = {
   source: 'https://github.com/YMaximum/my-site',
 };
 
-export type ProjectId = 'integration' | 'diagrams' | 'obatin';
+export type ProjectId =
+  'integration' | 'analytics' | 'modeler' | 'diagrams' | 'obatin';
 
 export interface Project {
   id: ProjectId;
@@ -52,6 +53,58 @@ export const projects: Project[] = [
     ],
     outcome:
       'Operators can configure reusable data sources, inspect proposed changes, and use dedicated installation tooling. This summary describes my contributions without exposing company or client infrastructure.',
+  },
+  {
+    id: 'analytics',
+    title: 'Turning data into understanding.',
+    category: 'FQ Analytical',
+    summary:
+      'An analytical product connecting data exploration and statistical processing with interfaces people can work with.',
+    technologies: ['Python', 'pandas', 'NumPy', 'React', 'Next.js'],
+    context:
+      'Analytical tools need to connect numerical processing with a usable product. People need to explore their data, inspect results, and work through the questions those results raise.',
+    contribution:
+      'I work on FQ Analytical across its analytical capabilities and product interfaces. The product uses pandas, NumPy, and Python statistics libraries, alongside a React-based frontend.',
+    decisions: [
+      {
+        title: 'Connect analysis to the interface.',
+        description:
+          'I worked on data-population filters, chart empty states, and report previews and downloads, so people can explore and share analytical results.',
+      },
+      {
+        title: 'Keep results usable.',
+        description:
+          'My implementation work includes scientific-number formatting and handling errors in advanced-analysis results, alongside the product’s Python data-processing and statistics capabilities.',
+      },
+    ],
+    outcome:
+      'A company product that brings analytical processing and data exploration into a working interface. My contribution spans the analytical work and the product experience.',
+  },
+  {
+    id: 'modeler',
+    title: 'Modeling assets, together.',
+    category: 'FQ Modeler',
+    summary:
+      'A real-time collaborative asset diagram editor. I spearheaded its development so people can work on a shared model together.',
+    technologies: ['React Flow', 'Yjs', 'WebSocket', 'NestJS', 'TypeScript'],
+    context:
+      'Asset diagrams represent relationships that teams need to work on together. A shared editor must keep diagram changes and collaborator presence connected across active sessions.',
+    contribution:
+      'I spearheaded the development of the collaborative asset editor, working across the React interface and NestJS backend. My implementation work includes shared state, WebSocket communication, and collaborator presence.',
+    decisions: [
+      {
+        title: 'Share the model, not just the screen.',
+        description:
+          'React Flow provides the diagram interface, while Yjs and WebSocket communication connect the shared state across collaborators.',
+      },
+      {
+        title: 'Keep collaboration in context.',
+        description:
+          'I worked on collaborator presence and canvas transitions, including cleaning up cursor state when someone leaves or changes their active canvas.',
+      },
+    ],
+    outcome:
+      'A collaborative asset modeling product with real-time shared editing and collaborator presence. I led this development as part of the company’s product team.',
   },
   {
     id: 'diagrams',
@@ -169,12 +222,29 @@ export const workflow = [
 export const experiences = [
   {
     company: 'Biaenergi',
+    role: 'Full-stack Software Engineer',
+    type: 'Full-time',
+    start: 'Jul 2025',
+    end: 'Present',
+    description:
+      'Working across data integration, FQ Analytical, and the FQ Modeler collaborative asset editor. I own product decisions, interfaces, backend work, and testing; handle client on-premise deployments and company server management; and am bringing practical AI workflows into the product team.',
+    technologies: [
+      'React',
+      'TypeScript',
+      'Python',
+      'NestJS',
+      'PostgreSQL',
+      'Docker',
+    ],
+  },
+  {
+    company: 'Biaenergi',
     role: 'Backend Engineer',
     type: 'Contract',
     start: 'Aug 2024',
-    end: 'Present',
+    end: 'Jul 2025',
     description:
-      'Building products around users’ needs, maintaining on-premise systems, and contributing across interfaces, backend services, testing, and deployment. Now exploring practical AI adoption for the product team.',
+      'Joined Biaenergi on a contract before moving into a full-time role in July 2025. Contributed to company product development across interfaces, backend services, testing, and deployment.',
   },
   {
     company: 'Sea Labs Indonesia',

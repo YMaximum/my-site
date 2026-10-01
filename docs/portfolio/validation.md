@@ -11,21 +11,22 @@ Verified 1 October 2026 (Asia/Jakarta) in the managed workspace.
 - Mobile navigation, reduced-motion support, semantic controls, and copy-email feedback.
 - Site metadata and a custom SVG favicon.
 
-Company work uses a generalized description. The illustrations are explicitly labeled as concepts. OpenClaw and VPS automation remain labeled as explorations. Existing employment titles and dates are retained; LinkedIn was not independently reviewed.
+Company work uses sanitized descriptions of data integration, FQ Analytical, and FQ Modeler, alongside on-premise deployment and server management. Illustrations are labeled as concepts. OpenClaw and VPS automation remain explorations. Biaenergi employment dates and the current full-time full-stack role follow the user’s corrections; other employment history is retained. Accessible GitHub manifests and contributions informed the technical descriptions. LinkedIn is unavailable under the managed network policy and was not independently reviewed.
 
 ## Checks
 
 - TypeScript and production build: passed.
 - ESLint: passed.
-- Eight Playwright tests: passed against the production build with Chromium.
+- All 20 Playwright tests pass against the production build with Chromium, including exact divider alignment, all five case studies, and updated company history.
 - No horizontal overflow or page errors at 1440, 768, 390, and 320 pixels.
 - Automated axe WCAG A/AA checks pass for the page and open case-study dialog at all four widths.
-- Verified case-study deep links, Escape dismissal, focus return, browser Back, workflow reload persistence, mobile menu behavior, clipboard success, and reduced-motion scrolling.
+- Checks cover case-study deep links, animated Escape dismissal, outside-click and drag behavior, sticky close controls, focus return, browser Back, every workflow stage, mobile menus, clipboard success/failure, and motion preferences.
+- Divider alignment is checked within one CSS pixel of the sticky header at 1440, 768, 390, and 320 pixels, including smooth navigation, direct hash URLs, reloads, and the final Contact section at different viewport heights. Section boundaries remain stationary during content reveals.
 - Desktop and mobile screenshots inspected; improved supporting text size, corrected diagram clipping, and darkened labels that failed contrast.
 
 Automated accessibility checks cover the rendered states exercised in the suite; they do not replace an assistive-technology review. Browser verification used Chromium, not a full cross-browser matrix.
 
-Build output is approximately 79.5 kB of JavaScript and 7 kB of CSS when compressed, plus a 24.8 kB locally served font. No private company source, infrastructure details, or account credentials are included.
+Build output is approximately 82.2 kB of JavaScript and 8.9 kB of CSS when compressed, plus a 24.8 kB locally served font. No private company source, infrastructure details, or account credentials are included.
 
 ## Reproduce
 

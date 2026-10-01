@@ -10,14 +10,14 @@ Working positioning: **I build products and improve how teams deliver.**
 
 Draft introduction: “I'm Naufal Yassar, a software engineer who works across product decisions, interfaces, implementation, testing and deployment. I'm now exploring how AI can help product teams work more effectively.”
 
-Treat current AI adoption responsibilities as the user's account, not a verified new job title. Keep the existing Backend Engineer employment title until updated by evidence or the user. Do not label him an AI expert, imply model training expertise, or invent time savings.
+Treat current AI adoption responsibilities as the user's account, not a verified new job title. The user has corrected the current title to Full-stack Software Engineer and employment type to full-time since July 2025. The earlier Backend Engineer contract ran from August 2024 to July 2025. Do not label him an AI expert, imply model training expertise, or invent time savings.
 
 ## Content structure
 
 1. **Introduction.** Name, software engineer role, positioning, concise introduction, “View selected work” anchor and “Email me” link. Top navigation: Work, Approach, Experience, Contact.
-2. **Selected work.** Lead with the company data-integration case study in a sanitized form; follow with collaborative diagrams and one additional public project if source inspection supports enough substance. Prefer three substantial projects over every exercise repository.
+2. **Selected work.** Lead with the company data-integration case study in a sanitized form; follow with collaborative diagrams and one additional public project if source inspection supports enough substance. Prioritize the data integration flagship, FQ Analytical, and FQ Modeler; retain the two public projects as supporting work.
 3. **How I work with AI.** Explain the user's Claude Code workflow as a real process: brainstorm, plan tickets, implement, review, test, deploy. Describe Naufal's decisions and oversight. This is a workflow diagram, not an invented multi-agent product demo.
-4. **Experience.** Preserve the existing Biaenergi, Sea Labs Indonesia and GoTo Impact Foundation history and dates. Rewrite verbose descriptions for clarity without extending them with guessed accomplishments.
+4. **Experience.** Use the user-corrected Biaenergi history: full-time Full-stack Software Engineer from July 2025 to present, preceded by the Backend Engineer contract from August 2024 to July 2025. Preserve Sea Labs Indonesia and GoTo Impact Foundation history and dates. Rewrite verbose descriptions for clarity without extending them with guessed accomplishments.
 5. **Currently exploring.** OpenClaw for scoped company-resource access and VPS-based daily automation. Explicitly label these as plans or ongoing learning. Do not claim deployed integrations.
 6. **Contact.** Existing GitHub, LinkedIn and email links. No claim that Naufal is seeking employment or accepting freelance work without his instruction.
 
@@ -41,7 +41,7 @@ Each case study should state the problem, Naufal's contribution, one or two cons
 
 ## Reference research and limits
 
-The managed environment's network policy restricts destinations. LinkedIn and live inspiration sites have not been visually reviewed. GitHub connector reads supplied the following actual source references:
+The managed environment's network policy restricts destinations. LinkedIn remains unavailable under the managed network policy and has not been independently reviewed. The user’s employment corrections and work descriptions are authoritative; accessible GitHub evidence supports the technical details. Live inspiration sites have not been visually reviewed. GitHub connector reads supplied the following actual source references:
 
 - [Brittany Chiang v4](https://github.com/bchiang7/v4): inspected README and featured-project component. Its 12-column layout, deliberate spacing and substantial project descriptions show useful project hierarchy. Use that principle with original composition. Avoid reproducing its code or signature navy/green palette. [Live version](https://v4.brittanychiang.com/).
 - [Paco Coursey's archived portfolio](https://github.com/pacocoursey/paco): inspected README, introduction and project page. Useful for concise identity, curated work and restraint. The repository explicitly describes itself as the outdated 2020 site, so it does not establish the current appearance of paco.sh.
@@ -152,3 +152,12 @@ The dark theme and motion revision passes the production build, ESLint, formatti
 The browser checks cover animated Escape and browser Back dismissal, outside-click dismissal without mistaking a content drag for a backdrop click, the close button after scrolling to the bottom, all three case-study actions, all six workflow stages on desktop and mobile, every navigation anchor, clipboard success and failure, and persisted motion preferences including live system preference changes. The top anchor was moved from the sticky header to the page root after the new navigation test exposed that bug.
 
 Motion uses CSS and the Web Animations API without another runtime dependency. Browser verification used Chromium; a full cross-browser matrix has not been run. GitHub-hosted checks have previously been blocked by an account billing lock; local verification is complete.
+
+
+## Section alignment and company work revision
+
+Use one scroll offset matching the sticky header at each breakpoint. Section margins must not add a second offset. Anchor the section boundary immediately below the header, keeping its normal internal spacing. Give the final Contact section enough height to align even near the document end; use the dynamic viewport height for mobile browser chrome. Keep native anchor links, smooth scrolling, reduced-motion behavior, query state, and direct hash URLs.
+
+The user describes FQ Analytical work with pandas, NumPy, and Python statistics libraries; FQ Modeler leadership for a real-time collaborative asset editor; client on-premise deployments; and company on-premise server management. Add these as company work with conceptual illustrations and contribution-specific copy. Current connected company dependency manifests and authored commits corroborate React/Next.js analytics interfaces, NumPy services, data-population filters, chart states, report previews/downloads, and analytical result formatting/error handling, and the modeler’s React Flow, Yjs, Socket.IO/WebSocket and NestJS/TypeScript stack, including canvas presence handling. The Python pandas usage and leadership scope come from the user’s account. The current work’s development branches were checked rather than relying on older default-branch manifests.
+
+Keep company repository URLs, internal paths, client information, and source code out of the public site and documentation. Add no unavailable source-link controls to the company case studies. The current experience lists a supported stack; it does not claim an independently reviewed LinkedIn skills list.

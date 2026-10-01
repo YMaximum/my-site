@@ -1,6 +1,6 @@
 # Naufal Yassar's portfolio
 
-A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A dark palette, geometric background, and fluid transitions frame selected project case studies, an interactive development workflow, experience, ongoing explorations, and contact links. A header control pauses motion; system reduced-motion preferences take priority. Case studies use native modal dialogs with outside-click dismissal and sticky close controls.
+A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A dark palette, geometric background, and fluid transitions frame selected project case studies, an interactive development workflow, company analytics and asset-modeling work, experience, operational ownership, ongoing explorations, and contact links. A header control pauses motion; system reduced-motion preferences take priority. Case studies use native modal dialogs with outside-click dismissal and sticky close controls.
 
 ## Run locally
 
@@ -20,7 +20,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite checks case-study deep links, animated dismissal, outside-click and drag behavior, sticky close controls, keyboard focus, all workflow stages and navigation controls, email copying and its failure path, responsive overflow, motion preferences, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
+The browser suite checks case-study deep links, animated dismissal, outside-click and drag behavior, sticky close controls, keyboard focus, all workflow stages and navigation controls, exact section-divider alignment across breakpoints, updated employment dates, email copying and its failure path, responsive overflow, motion preferences, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
 
 ## Build and host
 

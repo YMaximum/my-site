@@ -140,7 +140,7 @@ export default function App() {
               <span />
             </span>
             <span>
-              Naufal Yassar<small>Software engineer</small>
+              Naufal Yassar<small>Full-stack engineer</small>
             </span>
           </a>
           <button
@@ -307,6 +307,19 @@ export default function App() {
             </div>
             <ProjectVisual project='integration' />
           </article>
+          <div className='operations-note' data-reveal>
+            <span className='operations-icon'>
+              <Icon name='Server' size={24} />
+            </span>
+            <div>
+              <h3>Ownership beyond the code</h3>
+              <p>
+                I also handle client on-premise deployments and manage our
+                company’s on-premise servers. Delivery includes the environment
+                where the product actually runs.
+              </p>
+            </div>
+          </div>
           <div className='project-grid'>
             {projects.slice(1).map((project) => (
               <article
@@ -332,15 +345,17 @@ export default function App() {
                     >
                       Explore the project <Icon name='ArrowUpRight' size={17} />
                     </button>
-                    <a
-                      className='icon-button'
-                      href={project.repository}
-                      target='_blank'
-                      rel='noreferrer'
-                      aria-label={`View the ${project.category.toLowerCase()} source on GitHub`}
-                    >
-                      <Icon name='Github' size={19} />
-                    </a>
+                    {project.repository && (
+                      <a
+                        className='icon-button'
+                        href={project.repository}
+                        target='_blank'
+                        rel='noreferrer'
+                        aria-label={`View the ${project.category.toLowerCase()} source on GitHub`}
+                      >
+                        <Icon name='Github' size={19} />
+                      </a>
+                    )}
                   </div>
                 </div>
               </article>
@@ -417,7 +432,7 @@ export default function App() {
             {experiences.map((experience, index) => (
               <article
                 className='experience-item'
-                key={experience.company}
+                key={`${experience.company}-${experience.start}`}
                 data-reveal
               >
                 <div
@@ -435,6 +450,16 @@ export default function App() {
                 <p className='experience-description'>
                   {experience.description}
                 </p>
+                {experience.technologies && (
+                  <ul
+                    className='tech-list experience-stack'
+                    aria-label='Tools I work with'
+                  >
+                    {experience.technologies.map((tech) => (
+                      <li key={tech}>{tech}</li>
+                    ))}
+                  </ul>
+                )}
               </article>
             ))}
           </div>
@@ -443,9 +468,8 @@ export default function App() {
         <section
           className='exploring-section container'
           aria-labelledby='exploring-title'
-          data-reveal
         >
-          <div className='exploring-heading'>
+          <div className='exploring-heading' data-reveal>
             <span className='exploring-icon'>
               <Icon name='Sparkles' size={21} />
             </span>
@@ -454,7 +478,7 @@ export default function App() {
               <p>Things I'm learning and exploring next.</p>
             </div>
           </div>
-          <div className='exploring-grid'>
+          <div className='exploring-grid' data-reveal>
             <article>
               <Icon name='Network' size={22} />
               <div>

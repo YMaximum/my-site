@@ -93,12 +93,12 @@ function IntegrationVisual() {
   );
 }
 
-function DiagramVisual() {
+function DiagramVisual({ assetEditor = false }: { assetEditor?: boolean }) {
   return (
     <div className='diagram-visual'>
       <div className='diagram-header'>
         <Icon name='Network' size={17} />
-        <span>A shared canvas</span>
+        <span>{assetEditor ? 'A shared asset model' : 'A shared canvas'}</span>
         <span className='visual-caption'>Concept illustration</span>
       </div>
       <svg
@@ -112,15 +112,15 @@ function DiagramVisual() {
       </svg>
       <div className='canvas-node idea-node'>
         <Icon name='Sparkles' size={19} />
-        <span>An idea</span>
+        <span>{assetEditor ? 'An asset' : 'An idea'}</span>
       </div>
       <div className='canvas-node design-node'>
         <span className='small-dot' />
-        <span>Explore it</span>
+        <span>{assetEditor ? 'Connect it' : 'Explore it'}</span>
       </div>
       <div className='canvas-node build-node'>
         <Icon name='Code2' size={17} />
-        <span>Build it</span>
+        <span>{assetEditor ? 'Model it' : 'Build it'}</span>
       </div>
       <div className='collab-cursor cursor-one'>
         <Icon name='MousePointer2' size={20} />
@@ -172,13 +172,60 @@ function HealthcareVisual() {
   );
 }
 
+function AnalyticsVisual() {
+  return (
+    <div className='analytics-visual'>
+      <div className='diagram-header'>
+        <Icon name='SlidersHorizontal' size={17} />
+        <span>From data to understanding</span>
+        <span className='visual-caption'>Concept illustration</span>
+      </div>
+      <div className='analytics-chart'>
+        <span className='analytics-label'>
+          Explore patterns. Ask better questions.
+        </span>
+        <svg
+          viewBox='0 0 460 115'
+          aria-hidden='true'
+          preserveAspectRatio='none'
+        >
+          <path className='analytics-baseline' d='M0 82H460 M0 44H460' />
+          <path
+            className='analytics-trend'
+            d='M0 95C40 94 42 80 75 82S118 69 150 65S200 64 228 48S280 56 306 38S357 47 385 23S430 29 460 12'
+          />
+          <path
+            className='analytics-pulse'
+            d='M0 95C40 94 42 80 75 82S118 69 150 65S200 64 228 48S280 56 306 38S357 47 385 23S430 29 460 12'
+          />
+        </svg>
+      </div>
+      <div className='analytics-stages'>
+        <span>
+          <Icon name='Database' size={16} /> Data
+        </span>
+        <Icon name='ChevronRight' size={14} />
+        <span>
+          <Icon name='SlidersHorizontal' size={16} /> Analysis
+        </span>
+        <Icon name='ChevronRight' size={14} />
+        <span>
+          <Icon name='ScanEye' size={16} /> Interpretation
+        </span>
+      </div>
+    </div>
+  );
+}
+
 export default function ProjectVisual({ project }: { project: ProjectId }) {
   return (
     <div className={`project-visual project-visual--${project}`}>
       {project === 'integration' ? (
         <IntegrationVisual />
-      ) : project === 'diagrams' ? (
-        <DiagramVisual />
+      ) : project === 'analytics' ? (
+        <AnalyticsVisual />
+      ) : project === 'modeler' || project === 'diagrams' ? (
+        <DiagramVisual assetEditor={project === 'modeler'} />
       ) : (
         <HealthcareVisual />
       )}

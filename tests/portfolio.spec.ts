@@ -334,6 +334,8 @@ test('all project buttons open their case study and the return action closes it'
   await page.goto('/');
   for (const [label, id] of [
     ['Read the case study', 'integration'],
+    ['Read the fq analytical case study', 'analytics'],
+    ['Read the fq modeler case study', 'modeler'],
     ['Read the collaboration experiment case study', 'diagrams'],
     ['Read the healthcare team project case study', 'obatin'],
   ]) {
@@ -385,4 +387,95 @@ test('navigation, contact links, and unavailable clipboard remain useful', async
   await expect(page.getByRole('status')).toHaveText(
     'Copy is unavailable. You can use the email link instead.',
   );
+});
+
+for (const width of [1440, 768, 390, 320]) {
+  test(`section dividers align below the header at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/');
+    const previous = {
+      work: '.hero',
+      approach: '#work',
+      experience: '#approach',
+      contact: '.exploring-section',
+    };
+
+    async function expectAligned(id: keyof typeof previous) {
+      await expect
+        .poll(() =>
+          page.evaluate((sectionId) => {
+            const header = document
+              .querySelector('.site-header')!
+              .getBoundingClientRect();
+            const section = document
+              .getElementById(sectionId)!
+              .getBoundingClientRect();
+            return Math.abs(section.top - header.bottom);
+          }, id),
+        )
+        .toBeLessThanOrEqual(1);
+      expect(
+        await page.locator(previous[id]).evaluate((element) => {
+          return (
+            element.getBoundingClientRect().bottom -
+            document.querySelector('.site-header')!.getBoundingClientRect()
+              .bottom
+          );
+        }),
+      ).toBeLessThanOrEqual(1);
+    }
+
+    await page.getByRole('link', { name: 'Explore my work' }).click();
+    await expectAligned('work');
+    for (const id of ['approach', 'experience', 'contact', 'work'] as const) {
+      if (width <= 640)
+        await page.getByRole('button', { name: 'Open navigation' }).click();
+      await page
+        .getByRole('navigation', { name: 'Main navigation' })
+        .locator(`a[href="#${id}"]`)
+        .click();
+      await expectAligned(id);
+    }
+    await page.reload();
+    await expectAligned('work');
+    // Direct section URLs use the same offset, including the final section.
+    await page.goto('/#contact');
+    await expectAligned('contact');
+    await page.setViewportSize({ width, height: 700 });
+    await page.reload();
+    await expectAligned('contact');
+  });
+}
+
+test('company work and employment dates reflect the updated profile', async ({
+  page,
+}) => {
+  await page.goto('/#experience');
+  const current = page.locator('.experience-item').nth(0);
+  await expect(current).toContainText('Jul 2025 — Present');
+  await expect(current).toContainText('Full-stack Software Engineer');
+  await expect(current).toContainText('Full-time');
+  await expect(current).toContainText('client on-premise deployments');
+  const contract = page.locator('.experience-item').nth(1);
+  await expect(contract).toContainText('Aug 2024 — Jul 2025');
+  await expect(contract).toContainText('Contract');
+  for (const id of ['analytics', 'modeler']) {
+    await page.goto(`/?project=${id}`);
+    const dialog = page.getByRole('dialog');
+    await expect(dialog).toBeVisible();
+    await expect(
+      dialog.getByRole('link', { name: 'Explore the repository' }),
+    ).toHaveCount(0);
+    await expect(
+      dialog.getByRole('heading', { name: 'My contribution' }),
+    ).toBeVisible();
+    await page.getByRole('button', { name: 'Close case study' }).click();
+    await expect(dialog).not.toBeVisible();
+  }
+  await expect(
+    page.getByRole('link', { name: /source on GitHub/ }),
+  ).toHaveCount(2);
 });
