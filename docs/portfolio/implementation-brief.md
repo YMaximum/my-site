@@ -25,7 +25,7 @@ Describe the systems by purpose. Do not publish proprietary product names, inter
 
 Retain the deep navy page (#0B111D), blue graphite surfaces (#111C2C), cool white text (#EDF2FA), slate secondary text (#ABB8CC), periwinkle actions (#9AB9FF), and blue slate dividers (#2A384E). Use locally bundled Manrope and muted technology brand colors with locally bundled Simple Icons SVGs.
 
-Desktop: one split slide, purpose on the left and system flow on the right. Mobile: purpose above the illustration. Named project selectors, previous/next buttons, arrow keys, and swiping provide navigation without autoplay. The active project is linkable and survives reloads. Keep motion restrained, respect reduced motion, and retain the persistent motion toggle.
+Desktop: one split slide, purpose on the left and system flow on the right. Mobile: purpose above the illustration. Named project selectors, previous/next buttons, arrow keys, and swiping provide navigation without autoplay. The active project is linkable and survives reloads. Keep motion restrained, respect system reduced motion automatically.
 
 The diagram enlargement uses a native dialog with animated dismissal, a sticky close control, Escape, backdrop dismissal, focus trapping, and focus return. Keep section boundaries stationary so anchors align exactly below the sticky header.
 
@@ -35,8 +35,10 @@ Pre-implementation critique: repeating five lengthy case studies obscured the co
 
 Reviewed local frontend-design and web-design-guidelines skills; see `.agents/skills/SOURCES.md`. Earlier repository reads of Brittany Chiang v4 and Paco Coursey's archived portfolio informed hierarchy and restraint; their live sites were not visually inspected. No external portfolio design has been copied.
 
-## Interactive toolkit revision
+## Floating toolkit revision
 
-Move technology badges out of the Biaenergi timeline into an overall toolkit. Retain the existing dark palette, Manrope, and muted brand colors. Desktop: under the introduction in the left Experience column, a bounded physics area drops named logo badges once on first appearance. Badges collide, settle, respond gently to a nearby mouse, and support dragging and keyboard movement. Keep their angles shallow and labels legible. Mobile: move the same toolkit after the timeline and immediately before the workbench; show two rows of automatically scrolling badges with pause and manual scrolling. Add Claude Code and Codex to the supported technology list.
+The user replaces rain with continuous floating and removes all visible motion controls and toolkit labels. Retain the dark palette, Manrope, muted technology colors, and named logos. Desktop: use the entire left Experience column as a transparent, bounded zero-gravity area. Badges move gently in different directions, bounce off each other and the boundaries, and retain dragging and keyboard movement. They can pass behind the introduction, with muted visibility there and the LinkedIn link remaining above the scene.
 
-Critique: falling logos alone would obscure the actual skills. Keep the written names, use real collisions instead of disconnected entrance effects, provide a static layout when motion is disabled, and pause simulations outside the viewport or when the page is hidden. Load the physics engine only when the desktop toolkit first enters view.
+Mobile: show one transparent, continuously scrolling line immediately before the workbench, fading logos into the dark page at both edges. Do not pause on hover, focus, or touch. Device reduced-motion preferences remain honored automatically; a static list or manually scrollable line remains available. Existing saved pause preferences are ignored.
+
+Critique: a boxed physics canvas and extra instructions draw attention away from the experience itself. The animation now belongs to the left column, and the mobile strip uses the user's supplied Netlify screenshot as its visual reference. The live Netlify page was blocked by the environment's network policy and was not visually reviewed. The explicit request to remove pause controls takes precedence over the design skill's default pause guidance. Pause computation automatically only off-screen or when the page is hidden; load physics on demand.

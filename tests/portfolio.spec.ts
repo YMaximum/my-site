@@ -236,23 +236,27 @@ for (const width of [1440, 390]) {
   });
 }
 
-test('motion can be paused, persists on reload, and respects system changes', async ({
+test('motion plays by default without controls and respects system changes', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await page.addInitScript(() =>
+    localStorage.setItem('portfolio-motion', 'paused'),
+  );
   await page.goto('/');
-  const orbit = page.locator('.geometry-orbit');
+  await expect(page.locator('.portfolio')).toHaveAttribute('data-motion', 'on');
   await expect(
-    page.getByRole('button', { name: 'Pause motion' }),
-  ).toHaveAttribute('aria-pressed', 'true');
-  const firstTransform = await orbit.evaluate(
+    page.getByRole('button', { name: /pause|play|enable motion/i }),
+  ).toHaveCount(0);
+  const orbit = page.locator('.geometry-orbit');
+  const transform = await orbit.evaluate(
     (element) => getComputedStyle(element).transform,
   );
   await expect
     .poll(() =>
       orbit.evaluate((element) => getComputedStyle(element).transform),
     )
-    .not.toBe(firstTransform);
+    .not.toBe(transform);
   await page.mouse.move(200, 300);
   await expect
     .poll(() =>
@@ -261,30 +265,11 @@ test('motion can be paused, persists on reload, and respects system changes', as
         .evaluate((element) => element.style.getPropertyValue('--pointer-x')),
     )
     .not.toBe('0px');
-  await page.getByRole('button', { name: 'Pause motion' }).click();
-  await expect(page.locator('.portfolio')).toHaveAttribute(
-    'data-motion',
-    'off',
-  );
-  expect(
-    await orbit.evaluate((element) => getComputedStyle(element).animationName),
-  ).toBe('none');
-  await page.reload();
-  await expect(
-    page.getByRole('button', { name: 'Enable motion' }),
-  ).toHaveAttribute('aria-pressed', 'false');
-  await page.getByRole('button', { name: 'Enable motion' }).click();
-  await expect(page.locator('.portfolio')).toHaveAttribute('data-motion', 'on');
   await page.emulateMedia({ reducedMotion: 'reduce' });
   await expect(page.locator('.portfolio')).toHaveAttribute(
     'data-motion',
     'off',
   );
-  await expect(
-    page.getByRole('button', {
-      name: 'Motion reduced by your system preference',
-    }),
-  ).toBeDisabled();
   expect(
     await orbit.evaluate((element) => getComputedStyle(element).animationName),
   ).toBe('none');
@@ -293,6 +278,10 @@ test('motion can be paused, persists on reload, and respects system changes', as
       () => getComputedStyle(document.documentElement).scrollBehavior,
     ),
   ).toBe('auto');
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
+  await expect(page.locator('.portfolio')).toHaveAttribute('data-motion', 'on');
+  await page.reload();
+  await expect(page.locator('.portfolio')).toHaveAttribute('data-motion', 'on');
 });
 
 for (const width of [1440, 390]) {
@@ -556,7 +545,7 @@ test('company work and employment dates reflect the updated profile', async ({
 });
 
 for (const width of [1440, 768]) {
-  test(`desktop toolkit drops once, supports drag and keyboard, and pauses at ${width}px`, async ({
+  test(`desktop toolkit floats across the column with drag and keyboard at ${width}px`, async ({
     page,
   }) => {
     test.setTimeout(45000);
@@ -572,40 +561,63 @@ for (const width of [1440, 768]) {
     await expect(stage).toHaveAttribute('data-physics', 'ready');
     const badges = stage.locator('.toolkit-badges:first-child li');
     await expect(badges).toHaveCount(20);
+    const area = await stage.boundingBox();
+    const sidebar = await page.locator('.experience-sidebar').boundingBox();
+    if (!area || !sidebar) throw new Error('Missing toolkit area');
+    expect(area.height).toBeCloseTo(sidebar.height, 0);
+    expect(area.width).toBeCloseTo(sidebar.width, 0);
+    expect(
+      await stage.evaluate((el) => getComputedStyle(el).backgroundColor),
+    ).toBe('rgba(0, 0, 0, 0)');
     await expect
-      .poll(
-        () =>
-          badges.evaluateAll((items) => {
-            const area = document
-              .querySelector('.toolkit-stage')!
-              .getBoundingClientRect();
-            return items.every((item) => {
-              const rect = item.getBoundingClientRect();
-              return (
-                rect.top >= area.top - 8 &&
-                rect.bottom <= area.bottom + 8 &&
-                rect.left >= area.left - 8 &&
-                rect.right <= area.right + 8
-              );
-            });
-          }),
-        { timeout: 15000 },
+      .poll(() =>
+        badges.evaluateAll((items) => {
+          const area = document
+            .querySelector('.toolkit-stage')!
+            .getBoundingClientRect();
+          return items.every((item) => {
+            const rect = item.getBoundingClientRect();
+            return (
+              rect.top >= area.top - 8 &&
+              rect.bottom <= area.bottom + 8 &&
+              rect.left >= area.left - 8 &&
+              rect.right <= area.right + 8
+            );
+          });
+        }),
       )
       .toBe(true);
-    await expect(stage).toHaveAttribute('data-settled', 'true', {
-      timeout: 15000,
+    const distribution = await badges.evaluateAll((items) => {
+      const area = document
+        .querySelector('.toolkit-stage')!
+        .getBoundingClientRect();
+      return items.map(
+        (item) => (item.getBoundingClientRect().top - area.top) / area.height,
+      );
     });
-    const area = await stage.boundingBox();
-    if (!area) throw new Error('Missing toolkit area');
-    const index = await badges.evaluateAll(
-      (items) =>
-        items
-          .map((item, index) => ({
-            index,
-            top: item.getBoundingClientRect().top,
-          }))
-          .sort((a, b) => a.top - b.top)[0].index,
-    );
+    expect(Math.min(...distribution)).toBeLessThan(0.25);
+    expect(Math.max(...distribution)).toBeGreaterThan(0.7);
+    const beforeFloat = await badges.first().getAttribute('style');
+    await expect
+      .poll(() => badges.first().getAttribute('style'))
+      .not.toBe(beforeFloat);
+    // Choose an unobstructed badge below the introductory text, still on screen.
+    const index = await badges.evaluateAll((items) => {
+      const candidates = items.map((item, index) => ({
+        index,
+        rect: item.getBoundingClientRect(),
+      }));
+      const candidate = candidates.find(
+        ({ rect, index }) =>
+          rect.top > 350 &&
+          rect.bottom < innerHeight - 20 &&
+          document
+            .elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
+            ?.closest('li') === items[index],
+      );
+      if (!candidate) throw new Error('No unobstructed badge');
+      return candidate.index;
+    });
     const badge = badges.nth(index).getByRole('button');
     const original = await badge.boundingBox();
     if (!original) throw new Error('Missing badge');
@@ -615,7 +627,11 @@ for (const width of [1440, 768]) {
     );
     await page.mouse.down();
     await expect(stage).toHaveAttribute('data-dragging', 'true');
-    await page.mouse.move(area.x + area.width / 2, area.y + 45, { steps: 15 });
+    await page.mouse.move(
+      original.x + original.width / 2,
+      original.y + original.height / 2 - 110,
+      { steps: 15 },
+    );
     await expect
       .poll(async () => (await badge.boundingBox())!.y)
       .toBeLessThan(original.y - 30);
@@ -623,54 +639,40 @@ for (const width of [1440, 768]) {
     await expect(stage).not.toHaveAttribute('data-dragging');
     await badge.focus();
     const beforeKey = await badge.evaluate(
-      (element) => element.parentElement!.style.transform,
+      (el) => el.parentElement!.style.transform,
     );
     await page.keyboard.press('ArrowLeft');
     await expect
-      .poll(() =>
-        badge.evaluate((element) => element.parentElement!.style.transform),
-      )
+      .poll(() => badge.evaluate((el) => el.parentElement!.style.transform))
       .not.toBe(beforeKey);
-    await page
-      .getByRole('button', { name: 'Pause motion', exact: true })
-      .click();
+    const linkedIn = page.locator('.experience-intro a');
+    await linkedIn.scrollIntoViewIfNeeded();
+    expect(
+      await linkedIn.evaluate((el) => {
+        const r = el.getBoundingClientRect();
+        return (
+          document
+            .elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)
+            ?.closest('a') === el
+        );
+      }),
+    ).toBe(true);
+    await expect(
+      page.getByText('Tools I build with', { exact: true }),
+    ).toHaveCount(0);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
     await expect(stage).not.toHaveAttribute('data-physics');
     await expect(stage.locator('button')).toHaveCount(0);
     await expect(stage.getByText('Claude Code', { exact: true })).toBeVisible();
     await expect(stage.getByText('Codex', { exact: true })).toBeVisible();
-    await page
-      .getByRole('button', { name: 'Enable motion', exact: true })
-      .click();
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     await expect(stage).toHaveAttribute('data-physics', 'ready');
-    await stage.scrollIntoViewIfNeeded();
-    await expect(stage).toHaveAttribute('data-settled', 'true', {
-      timeout: 15000,
-    });
-    // Record the brief falling phase while the native click is in progress.
-    await stage.evaluate((element) => {
-      const badge = element.querySelector('.toolkit-badges:first-child li')!;
-      const observer = new MutationObserver(() => {
-        if (
-          badge.getBoundingClientRect().bottom -
-            element.getBoundingClientRect().top <
-          100
-        ) {
-          element.setAttribute('data-reset-observed', 'true');
-          observer.disconnect();
-        }
-      });
-      observer.observe(badge, { attributes: true, attributeFilter: ['style'] });
-    });
-    await page
-      .getByRole('button', { name: 'Drop the toolkit badges again' })
-      .click();
-    await expect(stage).toHaveAttribute('data-reset-observed', 'true');
     expect(errors).toEqual([]);
   });
 }
 
 for (const width of [390, 320]) {
-  test(`mobile toolkit is below experience, scrolls automatically, and can pause at ${width}px`, async ({
+  test(`mobile toolkit is a transparent one-line autoplay strip at ${width}px`, async ({
     page,
   }) => {
     test.setTimeout(45000);
@@ -696,46 +698,58 @@ for (const width of [390, 320]) {
     expect(order.toolkit).toBeGreaterThanOrEqual(order.timeline);
     expect(order.workbench).toBeGreaterThanOrEqual(order.toolkitEnd);
     await expect(stage).not.toHaveAttribute('data-physics');
-    const position = await stage.evaluate((element) => element.scrollLeft);
-    await expect
-      .poll(() => stage.evaluate((element) => element.scrollLeft))
-      .toBeGreaterThan(position + 12);
-    await page.getByRole('button', { name: 'Pause toolkit carousel' }).click();
-    const paused = await stage.evaluate((element) => element.scrollLeft);
-    await page.waitForTimeout(350);
-    expect(await stage.evaluate((element) => element.scrollLeft)).toBe(paused);
-    await stage.evaluate((element) => {
-      element.scrollLeft += 200;
-    });
+    await expect(
+      page.getByRole('button', { name: /pause|play|enable motion/i }),
+    ).toHaveCount(0);
+    await expect(
+      page.getByText('Tools I build with', { exact: true }),
+    ).toHaveCount(0);
     expect(
-      await stage.evaluate((element) => element.scrollLeft),
-    ).toBeGreaterThan(paused + 150);
-    await page.getByRole('button', { name: 'Play toolkit carousel' }).click();
-    const resumed = await stage.evaluate((element) => element.scrollLeft);
+      await stage.evaluate((el) => getComputedStyle(el).backgroundColor),
+    ).toBe('rgba(0, 0, 0, 0)');
+    expect(
+      await stage.evaluate((el) => getComputedStyle(el).maskImage),
+    ).toContain('linear-gradient');
+    const tops = await stage
+      .locator('.toolkit-badges:first-child li')
+      .evaluateAll((items) =>
+        items.map((item) => item.getBoundingClientRect().top),
+      );
+    expect(Math.max(...tops) - Math.min(...tops)).toBeLessThan(1);
+    const position = await stage.evaluate((el) => el.scrollLeft);
     await expect
-      .poll(() => stage.evaluate((element) => element.scrollLeft))
-      .toBeGreaterThan(resumed + 12);
-    await stage.focus();
-    const focused = await stage.evaluate((element) => element.scrollLeft);
-    await page.waitForTimeout(350);
-    expect(await stage.evaluate((element) => element.scrollLeft)).toBe(focused);
+      .poll(() => stage.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(position + 12);
+    await stage.hover();
+    const hovered = await stage.evaluate((el) => el.scrollLeft);
+    await expect
+      .poll(() => stage.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(hovered + 12);
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expect(
-      page.getByRole('button', { name: 'Pause toolkit carousel' }),
-    ).toBeDisabled();
-    expect(await stage.evaluate((element) => element.scrollLeft)).toBe(0);
-    await expect(
-      stage
-        .locator('.toolkit-badges')
-        .first()
-        .getByText('Claude Code', { exact: true }),
-    ).toHaveCount(1);
-    await expect(
-      stage
-        .locator('.toolkit-badges')
-        .first()
-        .getByText('Codex', { exact: true }),
-    ).toHaveCount(1);
+    await expect(stage.locator('.toolkit-badges')).toHaveCount(1);
+    await expect.poll(() => stage.evaluate((el) => el.scrollLeft)).toBe(0);
+    await stage.focus();
+    await page.keyboard.press('ArrowRight');
+    await expect
+      .poll(() => stage.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(0);
+    // Let Chromium finish its native animated keyboard scroll before checking stability.
+    await expect
+      .poll(async () => {
+        const before = await stage.evaluate((el) => el.scrollLeft);
+        await page.waitForTimeout(150);
+        return (await stage.evaluate((el) => el.scrollLeft)) === before;
+      })
+      .toBe(true);
+    await stage.evaluate((el) => {
+      el.scrollLeft = 200;
+    });
+    await page.waitForTimeout(350);
+    expect(await stage.evaluate((el) => el.scrollLeft)).toBe(200);
+    await expect(stage.getByText('Claude Code', { exact: true })).toHaveCount(
+      1,
+    );
+    await expect(stage.getByText('Codex', { exact: true })).toHaveCount(1);
     const audit = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
       .analyze();
@@ -743,5 +757,10 @@ for (const width of [390, 320]) {
     expect(
       await page.evaluate(() => document.documentElement.scrollWidth),
     ).toBeLessThanOrEqual(width);
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await expect(stage.locator('.toolkit-badges')).toHaveCount(2);
+    await expect
+      .poll(() => stage.evaluate((el) => el.scrollLeft))
+      .toBeGreaterThan(12);
   });
 }

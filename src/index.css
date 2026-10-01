@@ -1711,16 +1711,6 @@ svg {
   transform-origin: left;
   transition: transform 180ms ease-out;
 }
-.motion-toggle {
-  flex-shrink: 0;
-  color: var(--muted);
-  border-color: var(--line);
-  width: 36px;
-  height: 36px;
-}
-.motion-toggle:disabled {
-  opacity: 0.6;
-}
 .main-navigation a {
   position: relative;
 }
@@ -2447,51 +2437,43 @@ html:has(.portfolio[data-motion='off']) {
   grid-template-areas: '. workspace .' 'source processing target';
 }
 
-/* A living toolkit: loose physics on the split layout, a ribbon on mobile. */
+/* The toolkit floats across the full left column, with no boxed stage. */
 .experience-sidebar {
   min-width: 0;
+  position: relative;
+  isolation: isolate;
+}
+.experience-intro {
+  position: relative;
+  z-index: 2;
+  pointer-events: none;
+}
+.experience-intro h2,
+.experience-intro p {
+  text-shadow:
+    0 0 6px var(--page),
+    0 0 16px var(--page);
+}
+.experience-intro .text-link {
+  pointer-events: auto;
+  background: var(--page);
+  box-shadow: 0 0 12px 6px var(--page);
 }
 .experience-toolkit {
-  margin-top: 38px;
+  position: absolute;
+  inset: 0;
   min-width: 0;
-}
-.toolkit-heading {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-}
-.toolkit-heading h3 {
-  font-size: 15px;
-  font-weight: 600;
-  letter-spacing: -0.02em;
-}
-.toolkit-control {
-  width: 34px;
-  height: 34px;
-  border: 1px solid var(--line);
-  border-radius: 50%;
-}
-.toolkit-control:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-.toolkit-hint {
-  color: var(--muted);
-  font-size: 11px;
-  line-height: 1.7;
-  margin-top: 6px;
+  z-index: 1;
 }
 .toolkit-stage {
   position: relative;
-  height: 440px;
-  margin-top: 14px;
+  width: 100%;
+  height: 100%;
   overflow: hidden;
-  border-bottom: 1px solid #415573;
-  border-radius: 12px;
-  background:
-    radial-gradient(#33486466 1px, transparent 1px) 0 0 / 22px 22px,
-    linear-gradient(180deg, #101c2c00, #101c2c66);
+  background: transparent;
+}
+.experience-toolkit[data-mode='floating'] .toolkit-stage {
+  mask-image: linear-gradient(to bottom, #0004 0, #0004 190px, #000 350px);
 }
 .toolkit-track {
   width: 100%;
@@ -2522,14 +2504,9 @@ html:has(.portfolio[data-motion='off']) {
   line-height: 1;
   font-weight: 550;
   padding: 12px 14px;
-  box-shadow: 0 4px 12px #03081240;
   cursor: grab;
   touch-action: none;
   user-select: none;
-}
-.toolkit-badge:disabled {
-  opacity: 1;
-  cursor: default;
 }
 .toolkit-badge svg {
   width: 18px;
@@ -2548,14 +2525,22 @@ html:has(.portfolio[data-motion='off']) {
 .toolkit-stage[data-dragging='true'] .toolkit-badge {
   cursor: grabbing;
 }
+.toolkit-stage:focus-visible,
 .toolkit-badge:focus-visible {
   outline: 2px solid var(--accent);
-  outline-offset: 3px;
+  outline-offset: -3px;
+}
+.experience-toolkit[data-mode='static'] {
+  position: relative;
+  margin-top: 32px;
+}
+.experience-toolkit[data-mode='static'] .toolkit-stage {
+  height: auto;
+}
+.experience-toolkit[data-mode='static'] .toolkit-badge {
+  cursor: default;
 }
 @media (min-width: 641px) and (max-width: 860px) {
-  .toolkit-stage {
-    height: 660px;
-  }
   .toolkit-badge {
     font-size: 12px;
     padding: 11px;
@@ -2574,53 +2559,46 @@ html:has(.portfolio[data-motion='off']) {
   }
   .experience-toolkit {
     order: 3;
-    margin-top: 0;
+    position: relative;
+    inset: auto;
+    margin: 0;
+  }
+  .experience-toolkit[data-mode='static'] {
+    margin: 0;
   }
   .toolkit-stage {
-    height: 120px;
-    overflow-x: auto;
-    overflow-y: hidden;
-    scrollbar-width: none;
-    border-bottom: 0;
-    border-radius: 8px;
-    background: #111c2c55;
-  }
-  .toolkit-stage::-webkit-scrollbar {
-    display: none;
+    height: 58px;
+    overflow: hidden;
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 12%,
+      #000 88%,
+      transparent
+    );
   }
   .toolkit-track {
     display: flex;
-    gap: 16px;
+    gap: 32px;
     padding: 12px 0;
     width: max-content;
   }
   .toolkit-badges {
-    display: grid;
-    grid-template-rows: repeat(2, 40px);
-    grid-auto-flow: column;
-    grid-auto-columns: max-content;
-    gap: 10px;
-  }
-  .toolkit-badges li {
-    display: flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    gap: 32px;
   }
   .toolkit-badge {
-    width: 100%;
-    font-size: 12px;
-    padding: 10px 13px;
-    touch-action: pan-x pan-y;
-    box-shadow: none;
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 8px 0;
+    font-size: 14px;
+    cursor: default;
   }
-}
-
-.experience-toolkit[data-mode='static'] .toolkit-stage {
-  height: auto;
-  min-height: 180px;
-  border-bottom: 0;
-}
-
-@media (min-width: 641px) and (max-width: 740px) {
-  .toolkit-stage {
-    height: 740px;
+  .experience-toolkit[data-mode='static'] .toolkit-stage {
+    height: 58px;
+    overflow-x: auto;
+    scrollbar-width: none;
   }
 }

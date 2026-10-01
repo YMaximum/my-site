@@ -6,7 +6,6 @@ import type {
 
 interface Controls {
   wake?: () => void;
-  reset?: () => void;
   start?: (index: number, x: number, y: number) => void;
   move?: (x: number, y: number, mouse: boolean) => void;
   end?: () => void;
@@ -38,8 +37,8 @@ export function useToolkitPhysics(
       if (cancelled || !element) return;
       const { Bodies, Body, Composite, Constraint, Engine, Sleeping, Vector } =
         Matter;
-      const engine = Engine.create({ enableSleeping: true });
-      engine.gravity.y = 1;
+      const engine = Engine.create({ enableSleeping: false });
+      engine.gravity.y = 0;
       const badges = [
         ...element.querySelectorAll<HTMLLIElement>(
           '.toolkit-badges:first-child li',
@@ -56,40 +55,72 @@ export function useToolkitPhysics(
       let accumulator = 0;
       let pointer: { x: number; y: number } | null = null;
       let grab: Matter.Constraint | null = null;
-      const bodies = sizes.map((size, index) =>
-        Bodies.rectangle(
-          Math.min(
-            width - size.width / 2 - 10,
-            size.width / 2 +
-              10 +
-              ((index * 71) % Math.max(1, width - size.width - 20)),
+      const random = (index: number) => {
+        const value = Math.sin(index * 12.9898 + 7) * 43758.5453;
+        return value - Math.floor(value);
+      };
+      const columns = Math.max(1, Math.floor(width / 145));
+      const rows = Math.ceil(sizes.length / columns);
+      const bodies = sizes.map((size, index) => {
+        const body = Bodies.rectangle(
+          Math.max(
+            size.width / 2 + 8,
+            Math.min(
+              width - size.width / 2 - 8,
+              (((index % columns) + 0.5) * width) / columns +
+                (random(index) - 0.5) * 20,
+            ),
           ),
-          -40 - index * 66,
+          Math.max(
+            size.height / 2 + 8,
+            Math.min(
+              height - size.height / 2 - 8,
+              ((Math.floor(index / columns) + 0.5) * height) / rows,
+            ),
+          ),
           size.width,
           size.height,
           {
             chamfer: { radius: 6 },
-            friction: 0.65,
-            frictionStatic: 0.8,
-            frictionAir: 0.025,
-            restitution: 0.12,
-            sleepThreshold: 50,
-            angle: ((index % 3) - 1) * 0.08,
+            friction: 0,
+            frictionStatic: 0,
+            frictionAir: 0,
+            restitution: 1,
+            angle: (random(index + 40) - 0.5) * 0.16,
           },
-        ),
-      );
+        );
+        const angle = random(index + 60) * Math.PI * 2;
+        const speed = 0.35 + random(index + 80) * 0.3;
+        Body.setVelocity(body, {
+          x: Math.cos(angle) * speed,
+          y: Math.sin(angle) * speed,
+        });
+        Body.setAngularVelocity(body, (random(index + 100) - 0.5) * 0.0015);
+        return body;
+      });
       let walls: Matter.Body[] = [];
       function buildWalls() {
         walls.forEach((wall) => Composite.remove(engine.world, wall));
         walls = [
-          Bodies.rectangle(width / 2, height + 20, width + 160, 40, {
+          Bodies.rectangle(width / 2, -16, width + 160, 40, {
             isStatic: true,
+            restitution: 1,
+            friction: 0,
           }),
-          Bodies.rectangle(-40, height / 2, 80, height + 5000, {
+          Bodies.rectangle(width / 2, height + 16, width + 160, 40, {
             isStatic: true,
+            restitution: 1,
+            friction: 0,
           }),
-          Bodies.rectangle(width + 40, height / 2, 80, height + 5000, {
+          Bodies.rectangle(-36, height / 2, 80, height + 160, {
             isStatic: true,
+            restitution: 1,
+            friction: 0,
+          }),
+          Bodies.rectangle(width + 36, height / 2, 80, height + 160, {
+            isStatic: true,
+            restitution: 1,
+            friction: 0,
           }),
         ];
         Composite.add(engine.world, walls);
@@ -105,7 +136,6 @@ export function useToolkitPhysics(
       }
       function schedule() {
         if (!frame && visibleNow.current && !document.hidden) {
-          element!.removeAttribute('data-settled');
           frame = requestAnimationFrame(tick);
         }
       }
@@ -119,19 +149,32 @@ export function useToolkitPhysics(
           ? Math.min(time - previousTime, 1000 / 15)
           : 1000 / 60;
         previousTime = time;
-        let nearby = false;
-        bodies.forEach((body) => {
-          // Keep names readable while preserving the feel of a loose pile.
-          if (Math.abs(body.angle) > 0.28) {
-            Body.setAngle(body, Math.sign(body.angle) * 0.28);
-            Body.setAngularVelocity(body, 0);
+        bodies.forEach((body, index) => {
+          // Gentle drift and shallow rotations keep the floating names readable.
+          if (Math.abs(body.angle) > 0.2) {
+            Body.setAngle(body, Math.sign(body.angle) * 0.2);
+            Body.setAngularVelocity(body, -Math.sign(body.angle) * 0.001);
+          }
+          if (body !== grab?.bodyB) {
+            const speed = Math.hypot(body.velocity.x, body.velocity.y);
+            if (speed < 0.3) {
+              const angle = random(index + 60) * Math.PI * 2;
+              Body.setVelocity(body, {
+                x: Math.cos(angle) * 0.4,
+                y: Math.sin(angle) * 0.4,
+              });
+            } else if (speed > 0.9) {
+              Body.setVelocity(body, {
+                x: (body.velocity.x / speed) * 0.9,
+                y: (body.velocity.y / speed) * 0.9,
+              });
+            }
           }
           if (pointer && !grab) {
             const dx = body.position.x - pointer.x;
             const dy = body.position.y - pointer.y;
             const distance = Math.hypot(dx, dy);
             if (distance < 95 && distance > 1) {
-              nearby = true;
               Sleeping.set(body, false);
               const force = (1 - distance / 95) * 0.00022 * body.mass;
               Body.applyForce(body, body.position, {
@@ -141,19 +184,14 @@ export function useToolkitPhysics(
             }
           }
         });
-        // Fixed steps keep gravity consistent on both fast and slower displays.
+        // Fixed steps keep drift consistent on both fast and slower displays.
         accumulator += delta;
         while (accumulator >= 1000 / 60) {
           Engine.update(engine, 1000 / 60);
           accumulator -= 1000 / 60;
         }
         draw();
-        if (grab || nearby || bodies.some((body) => !body.isSleeping))
-          schedule();
-        else {
-          previousTime = 0;
-          element!.setAttribute('data-settled', 'true');
-        }
+        schedule();
       }
       Composite.add(engine.world, bodies);
       buildWalls();
@@ -203,24 +241,6 @@ export function useToolkitPhysics(
       }
       controls.current = {
         wake: schedule,
-        reset() {
-          release();
-          bodies.forEach((body, index) => {
-            Sleeping.set(body, false);
-            Body.setPosition(body, {
-              x:
-                sizes[index].width / 2 +
-                10 +
-                ((index * 71) % Math.max(1, width - sizes[index].width - 20)),
-              y: -40 - index * 66,
-            });
-            Body.setVelocity(body, { x: 0, y: 0 });
-            Body.setAngle(body, ((index % 3) - 1) * 0.08);
-            Body.setAngularVelocity(body, 0);
-          });
-          draw();
-          schedule();
-        },
         start(index, x, y) {
           release();
           const body = bodies[index];
@@ -289,7 +309,6 @@ export function useToolkitPhysics(
         Composite.clear(engine.world, false);
         Engine.clear(engine);
         element.removeAttribute('data-physics');
-        element.removeAttribute('data-settled');
         element.removeAttribute('data-dragging');
         badges.forEach((badge) => badge.style.removeProperty('transform'));
       };
@@ -304,7 +323,6 @@ export function useToolkitPhysics(
   }, [stage, enabled]);
 
   return {
-    reset: () => controls.current.reset?.(),
     start(index: number, event: ReactPointerEvent<HTMLButtonElement>) {
       if (event.button !== 0 || !controls.current.start) return;
       event.preventDefault();

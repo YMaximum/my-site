@@ -35,7 +35,7 @@ function readPageState() {
 }
 
 export default function App() {
-  const { motionEnabled, reducedMotion, toggleMotion } = useMotionPreference();
+  const { motionEnabled } = useMotionPreference();
   const [pageState, setPageState] = useState(readPageState);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
@@ -186,28 +186,6 @@ export default function App() {
               </a>
             ))}
           </nav>
-          <button
-            className='icon-button motion-toggle'
-            onClick={toggleMotion}
-            disabled={reducedMotion}
-            aria-label={
-              reducedMotion
-                ? 'Motion reduced by your system preference'
-                : motionEnabled
-                  ? 'Pause motion'
-                  : 'Enable motion'
-            }
-            aria-pressed={motionEnabled}
-            title={
-              reducedMotion
-                ? 'Your reduced-motion preference is active'
-                : motionEnabled
-                  ? 'Pause motion'
-                  : 'Enable motion'
-            }
-          >
-            <Icon name={motionEnabled ? 'Pause' : 'Play'} size={18} />
-          </button>
           <a
             className='header-github'
             href={profile.github}

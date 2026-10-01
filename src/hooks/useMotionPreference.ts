@@ -1,4 +1,4 @@
-import { useState, useSyncExternalStore } from 'react';
+import { useSyncExternalStore } from 'react';
 
 const query = '(prefers-reduced-motion: reduce)';
 
@@ -14,27 +14,5 @@ export function useMotionPreference() {
     () => window.matchMedia(query).matches,
     () => true,
   );
-  const [paused, setPaused] = useState(() => {
-    try {
-      return window.localStorage.getItem('portfolio-motion') === 'paused';
-    } catch {
-      return false;
-    }
-  });
-
-  function toggleMotion() {
-    const next = !paused;
-    setPaused(next);
-    try {
-      window.localStorage.setItem('portfolio-motion', next ? 'paused' : 'on');
-    } catch {
-      // The control still works when browser storage is unavailable.
-    }
-  }
-
-  return {
-    motionEnabled: !paused && !reducedMotion,
-    reducedMotion,
-    toggleMotion,
-  };
+  return { motionEnabled: !reducedMotion, reducedMotion };
 }
