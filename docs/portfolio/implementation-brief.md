@@ -34,3 +34,9 @@ Pre-implementation critique: repeating five lengthy case studies obscured the co
 ## Reference provenance
 
 Reviewed local frontend-design and web-design-guidelines skills; see `.agents/skills/SOURCES.md`. Earlier repository reads of Brittany Chiang v4 and Paco Coursey's archived portfolio informed hierarchy and restraint; their live sites were not visually inspected. No external portfolio design has been copied.
+
+## Interactive toolkit revision
+
+Move technology badges out of the Biaenergi timeline into an overall toolkit. Retain the existing dark palette, Manrope, and muted brand colors. Desktop: under the introduction in the left Experience column, a bounded physics area drops named logo badges once on first appearance. Badges collide, settle, respond gently to a nearby mouse, and support dragging and keyboard movement. Keep their angles shallow and labels legible. Mobile: move the same toolkit after the timeline and immediately before the workbench; show two rows of automatically scrolling badges with pause and manual scrolling. Add Claude Code and Codex to the supported technology list.
+
+Critique: falling logos alone would obscure the actual skills. Keep the written names, use real collisions instead of disconnected entrance effects, provide a static layout when motion is disabled, and pause simulations outside the viewport or when the page is hidden. Load the physics engine only when the desktop toolkit first enters view.

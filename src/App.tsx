@@ -4,7 +4,7 @@ import MotionEffects from './components/MotionEffects';
 import { useMotionPreference } from './hooks/useMotionPreference';
 import ProjectDialog from './components/ProjectDialog';
 import ProjectCarousel from './components/ProjectCarousel';
-import TechTags from './components/TechTags';
+import Toolkit from './components/Toolkit';
 import Workflow from './components/Workflow';
 import { experiences, profile, projects, workflow } from './data/portfolio';
 import type { ProjectId } from './data/portfolio';
@@ -345,24 +345,27 @@ export default function App() {
           className='experience-section section container'
           aria-labelledby='experience-title'
         >
-          <div className='experience-intro' data-reveal>
-            <h2 id='experience-title'>
-              Built on experience.
-              <br />
-              Driven by curiosity.
-            </h2>
-            <p className='secondary-text'>
-              Each role has widened my view of what it takes to build a useful
-              product.
-            </p>
-            <a
-              className='text-link'
-              href={profile.linkedin}
-              target='_blank'
-              rel='noreferrer'
-            >
-              Connect on LinkedIn <Icon name='ArrowUpRight' size={17} />
-            </a>
+          <div className='experience-sidebar'>
+            <div className='experience-intro' data-reveal>
+              <h2 id='experience-title'>
+                Built on experience.
+                <br />
+                Driven by curiosity.
+              </h2>
+              <p className='secondary-text'>
+                Each role has widened my view of what it takes to build a useful
+                product.
+              </p>
+              <a
+                className='text-link'
+                href={profile.linkedin}
+                target='_blank'
+                rel='noreferrer'
+              >
+                Connect on LinkedIn <Icon name='ArrowUpRight' size={17} />
+              </a>
+            </div>
+            <Toolkit motionEnabled={motionEnabled} />
           </div>
           <div className='experience-list'>
             {experiences.map((experience, index) => (
@@ -392,12 +395,6 @@ export default function App() {
                       <li key={item}>{item}</li>
                     ))}
                   </ul>
-                )}
-                {experience.technologies && (
-                  <TechTags
-                    technologies={experience.technologies}
-                    label='Tools I work with'
-                  />
                 )}
               </article>
             ))}

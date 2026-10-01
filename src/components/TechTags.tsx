@@ -1,34 +1,21 @@
-import type { CSSProperties } from 'react';
-import {
-  siReact,
-  siPython,
-  siPandas,
-  siNumpy,
-  siNextdotjs,
-  siTypescript,
-  siDocker,
-  siPostgresql,
-  siProxmox,
-  siRedhat,
-  siSocketdotio,
-  siNestjs,
-  type SimpleIcon,
-} from 'simple-icons';
+import { Code2 } from 'lucide-react';
+import { technologies, techStyle } from '../data/technologies';
 
-const technologies: Record<string, { icon: SimpleIcon; tint: string }> = {
-  React: { icon: siReact, tint: '#80d5ec' },
-  Python: { icon: siPython, tint: '#e6cc83' },
-  pandas: { icon: siPandas, tint: '#b7a6ee' },
-  NumPy: { icon: siNumpy, tint: '#89c5db' },
-  'Next.js': { icon: siNextdotjs, tint: '#d8dfec' },
-  TypeScript: { icon: siTypescript, tint: '#9bbdf5' },
-  Docker: { icon: siDocker, tint: '#87bff2' },
-  PostgreSQL: { icon: siPostgresql, tint: '#a7c5e4' },
-  Proxmox: { icon: siProxmox, tint: '#e8b28e' },
-  RHEL: { icon: siRedhat, tint: '#efa2a9' },
-  'Socket.IO': { icon: siSocketdotio, tint: '#c5d6e8' },
-  NestJS: { icon: siNestjs, tint: '#eea0ba' },
-};
+export function TechnologyMark({ name }: { name: string }) {
+  const tech = technologies[name];
+  return (
+    <>
+      {tech.icon ? (
+        <svg viewBox='0 0 24 24' aria-hidden='true'>
+          <path d={tech.icon.path} />
+        </svg>
+      ) : (
+        <Code2 size={16} aria-hidden='true' />
+      )}
+      <span>{name}</span>
+    </>
+  );
+}
 
 export default function TechTags({
   technologies: names,
@@ -39,17 +26,11 @@ export default function TechTags({
 }) {
   return (
     <ul className='tech-tags' aria-label={label}>
-      {names.map((name) => {
-        const tech = technologies[name];
-        return (
-          <li key={name} style={{ '--tech-tint': tech.tint } as CSSProperties}>
-            <svg viewBox='0 0 24 24' aria-hidden='true'>
-              <path d={tech.icon.path} />
-            </svg>
-            {name}
-          </li>
-        );
-      })}
+      {names.map((name) => (
+        <li key={name} style={techStyle(name)}>
+          <TechnologyMark name={name} />
+        </li>
+      ))}
     </ul>
   );
 }

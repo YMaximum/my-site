@@ -554,3 +554,194 @@ test('company work and employment dates reflect the updated profile', async ({
     page.getByRole('link', { name: /source on GitHub/ }),
   ).toHaveCount(0);
 });
+
+for (const width of [1440, 768]) {
+  test(`desktop toolkit drops once, supports drag and keyboard, and pauses at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(45000);
+    await page.setViewportSize({ width, height: 1000 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const errors: string[] = [];
+    page.on('pageerror', (error) => errors.push(error.message));
+    await page.goto('/');
+    const stage = page.locator('.toolkit-stage');
+    await expect(stage).not.toHaveAttribute('data-physics', 'ready');
+    await expect(page.locator('.experience-item .tech-tags')).toHaveCount(0);
+    await stage.scrollIntoViewIfNeeded();
+    await expect(stage).toHaveAttribute('data-physics', 'ready');
+    const badges = stage.locator('.toolkit-badges:first-child li');
+    await expect(badges).toHaveCount(20);
+    await expect
+      .poll(
+        () =>
+          badges.evaluateAll((items) => {
+            const area = document
+              .querySelector('.toolkit-stage')!
+              .getBoundingClientRect();
+            return items.every((item) => {
+              const rect = item.getBoundingClientRect();
+              return (
+                rect.top >= area.top - 8 &&
+                rect.bottom <= area.bottom + 8 &&
+                rect.left >= area.left - 8 &&
+                rect.right <= area.right + 8
+              );
+            });
+          }),
+        { timeout: 15000 },
+      )
+      .toBe(true);
+    await expect(stage).toHaveAttribute('data-settled', 'true', {
+      timeout: 15000,
+    });
+    const area = await stage.boundingBox();
+    if (!area) throw new Error('Missing toolkit area');
+    const index = await badges.evaluateAll(
+      (items) =>
+        items
+          .map((item, index) => ({
+            index,
+            top: item.getBoundingClientRect().top,
+          }))
+          .sort((a, b) => a.top - b.top)[0].index,
+    );
+    const badge = badges.nth(index).getByRole('button');
+    const original = await badge.boundingBox();
+    if (!original) throw new Error('Missing badge');
+    await page.mouse.move(
+      original.x + original.width / 2,
+      original.y + original.height / 2,
+    );
+    await page.mouse.down();
+    await expect(stage).toHaveAttribute('data-dragging', 'true');
+    await page.mouse.move(area.x + area.width / 2, area.y + 45, { steps: 15 });
+    await expect
+      .poll(async () => (await badge.boundingBox())!.y)
+      .toBeLessThan(original.y - 30);
+    await page.mouse.up();
+    await expect(stage).not.toHaveAttribute('data-dragging');
+    await badge.focus();
+    const beforeKey = await badge.evaluate(
+      (element) => element.parentElement!.style.transform,
+    );
+    await page.keyboard.press('ArrowLeft');
+    await expect
+      .poll(() =>
+        badge.evaluate((element) => element.parentElement!.style.transform),
+      )
+      .not.toBe(beforeKey);
+    await page
+      .getByRole('button', { name: 'Pause motion', exact: true })
+      .click();
+    await expect(stage).not.toHaveAttribute('data-physics');
+    await expect(stage.locator('button')).toHaveCount(0);
+    await expect(stage.getByText('Claude Code', { exact: true })).toBeVisible();
+    await expect(stage.getByText('Codex', { exact: true })).toBeVisible();
+    await page
+      .getByRole('button', { name: 'Enable motion', exact: true })
+      .click();
+    await expect(stage).toHaveAttribute('data-physics', 'ready');
+    await stage.scrollIntoViewIfNeeded();
+    await expect(stage).toHaveAttribute('data-settled', 'true', {
+      timeout: 15000,
+    });
+    // Record the brief falling phase while the native click is in progress.
+    await stage.evaluate((element) => {
+      const badge = element.querySelector('.toolkit-badges:first-child li')!;
+      const observer = new MutationObserver(() => {
+        if (
+          badge.getBoundingClientRect().bottom -
+            element.getBoundingClientRect().top <
+          100
+        ) {
+          element.setAttribute('data-reset-observed', 'true');
+          observer.disconnect();
+        }
+      });
+      observer.observe(badge, { attributes: true, attributeFilter: ['style'] });
+    });
+    await page
+      .getByRole('button', { name: 'Drop the toolkit badges again' })
+      .click();
+    await expect(stage).toHaveAttribute('data-reset-observed', 'true');
+    expect(errors).toEqual([]);
+  });
+}
+
+for (const width of [390, 320]) {
+  test(`mobile toolkit is below experience, scrolls automatically, and can pause at ${width}px`, async ({
+    page,
+  }) => {
+    test.setTimeout(45000);
+    await page.setViewportSize({ width, height: 844 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    await page.goto('/#experience');
+    const stage = page.locator('.toolkit-stage');
+    await stage.scrollIntoViewIfNeeded();
+    const order = await page.evaluate(() => ({
+      timeline: document
+        .querySelector('.experience-list')!
+        .getBoundingClientRect().bottom,
+      toolkit: document
+        .querySelector('.experience-toolkit')!
+        .getBoundingClientRect().top,
+      toolkitEnd: document
+        .querySelector('.experience-toolkit')!
+        .getBoundingClientRect().bottom,
+      workbench: document
+        .querySelector('.exploring-section')!
+        .getBoundingClientRect().top,
+    }));
+    expect(order.toolkit).toBeGreaterThanOrEqual(order.timeline);
+    expect(order.workbench).toBeGreaterThanOrEqual(order.toolkitEnd);
+    await expect(stage).not.toHaveAttribute('data-physics');
+    const position = await stage.evaluate((element) => element.scrollLeft);
+    await expect
+      .poll(() => stage.evaluate((element) => element.scrollLeft))
+      .toBeGreaterThan(position + 12);
+    await page.getByRole('button', { name: 'Pause toolkit carousel' }).click();
+    const paused = await stage.evaluate((element) => element.scrollLeft);
+    await page.waitForTimeout(350);
+    expect(await stage.evaluate((element) => element.scrollLeft)).toBe(paused);
+    await stage.evaluate((element) => {
+      element.scrollLeft += 200;
+    });
+    expect(
+      await stage.evaluate((element) => element.scrollLeft),
+    ).toBeGreaterThan(paused + 150);
+    await page.getByRole('button', { name: 'Play toolkit carousel' }).click();
+    const resumed = await stage.evaluate((element) => element.scrollLeft);
+    await expect
+      .poll(() => stage.evaluate((element) => element.scrollLeft))
+      .toBeGreaterThan(resumed + 12);
+    await stage.focus();
+    const focused = await stage.evaluate((element) => element.scrollLeft);
+    await page.waitForTimeout(350);
+    expect(await stage.evaluate((element) => element.scrollLeft)).toBe(focused);
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await expect(
+      page.getByRole('button', { name: 'Pause toolkit carousel' }),
+    ).toBeDisabled();
+    expect(await stage.evaluate((element) => element.scrollLeft)).toBe(0);
+    await expect(
+      stage
+        .locator('.toolkit-badges')
+        .first()
+        .getByText('Claude Code', { exact: true }),
+    ).toHaveCount(1);
+    await expect(
+      stage
+        .locator('.toolkit-badges')
+        .first()
+        .getByText('Codex', { exact: true }),
+    ).toHaveCount(1);
+    const audit = await new AxeBuilder({ page })
+      .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+      .analyze();
+    expect(audit.violations.map((item) => item.id)).toEqual([]);
+    expect(
+      await page.evaluate(() => document.documentElement.scrollWidth),
+    ).toBeLessThanOrEqual(width);
+  });
+}

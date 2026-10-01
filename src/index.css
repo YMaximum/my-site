@@ -2446,3 +2446,181 @@ html:has(.portfolio[data-motion='off']) {
   grid-template-columns: repeat(3, minmax(0, 1fr));
   grid-template-areas: '. workspace .' 'source processing target';
 }
+
+/* A living toolkit: loose physics on the split layout, a ribbon on mobile. */
+.experience-sidebar {
+  min-width: 0;
+}
+.experience-toolkit {
+  margin-top: 38px;
+  min-width: 0;
+}
+.toolkit-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+.toolkit-heading h3 {
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+.toolkit-control {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+}
+.toolkit-control:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+.toolkit-hint {
+  color: var(--muted);
+  font-size: 11px;
+  line-height: 1.7;
+  margin-top: 6px;
+}
+.toolkit-stage {
+  position: relative;
+  height: 440px;
+  margin-top: 14px;
+  overflow: hidden;
+  border-bottom: 1px solid #415573;
+  border-radius: 12px;
+  background:
+    radial-gradient(#33486466 1px, transparent 1px) 0 0 / 22px 22px,
+    linear-gradient(180deg, #101c2c00, #101c2c66);
+}
+.toolkit-track {
+  width: 100%;
+  padding: 12px;
+}
+.toolkit-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.toolkit-badges li {
+  flex-shrink: 0;
+}
+.toolkit-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+  color: var(--tech-tint);
+  background: color-mix(in srgb, var(--tech-tint) 9%, #111c2c);
+  border: 1px solid color-mix(in srgb, var(--tech-tint) 35%, #26364d);
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1;
+  font-weight: 550;
+  padding: 12px 14px;
+  box-shadow: 0 4px 12px #03081240;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.toolkit-badge:disabled {
+  opacity: 1;
+  cursor: default;
+}
+.toolkit-badge svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+.toolkit-badge svg:not([class]) {
+  fill: currentColor;
+}
+.toolkit-stage[data-physics='ready'] .toolkit-badges li {
+  position: absolute;
+  top: 0;
+  left: 0;
+  will-change: transform;
+}
+.toolkit-stage[data-dragging='true'] .toolkit-badge {
+  cursor: grabbing;
+}
+.toolkit-badge:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+@media (min-width: 641px) and (max-width: 860px) {
+  .toolkit-stage {
+    height: 660px;
+  }
+  .toolkit-badge {
+    font-size: 12px;
+    padding: 11px;
+    gap: 6px;
+  }
+}
+@media (max-width: 640px) {
+  .experience-sidebar {
+    display: contents;
+  }
+  .experience-intro {
+    order: 1;
+  }
+  .experience-list {
+    order: 2;
+  }
+  .experience-toolkit {
+    order: 3;
+    margin-top: 0;
+  }
+  .toolkit-stage {
+    height: 120px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: none;
+    border-bottom: 0;
+    border-radius: 8px;
+    background: #111c2c55;
+  }
+  .toolkit-stage::-webkit-scrollbar {
+    display: none;
+  }
+  .toolkit-track {
+    display: flex;
+    gap: 16px;
+    padding: 12px 0;
+    width: max-content;
+  }
+  .toolkit-badges {
+    display: grid;
+    grid-template-rows: repeat(2, 40px);
+    grid-auto-flow: column;
+    grid-auto-columns: max-content;
+    gap: 10px;
+  }
+  .toolkit-badges li {
+    display: flex;
+  }
+  .toolkit-badge {
+    width: 100%;
+    font-size: 12px;
+    padding: 10px 13px;
+    touch-action: pan-x pan-y;
+    box-shadow: none;
+  }
+}
+
+.experience-toolkit[data-mode='static'] .toolkit-stage {
+  height: auto;
+  min-height: 180px;
+  border-bottom: 0;
+}
+
+@media (min-width: 641px) and (max-width: 740px) {
+  .toolkit-stage {
+    height: 740px;
+  }
+}

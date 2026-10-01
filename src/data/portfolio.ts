@@ -124,14 +124,6 @@ export const experiences = [
       'Handle client on-premise deployments and company server management, including Windows/Linux VMs and Proxmox high availability.',
       'Improve product performance and maintain delivery pipelines with GitHub Actions and Jenkins.',
     ],
-    technologies: [
-      'React',
-      'TypeScript',
-      'Python',
-      'Docker',
-      'Proxmox',
-      'RHEL',
-    ],
   },
   {
     company: 'Biaenergi',
@@ -160,4 +152,27 @@ export const experiences = [
     description:
       'Full-stack training with the MERN stack, followed by project collaboration with Jabar Digital Service. Built practical experience turning requirements into working software.',
   },
+];
+
+export const toolkit = [
+  'React',
+  'TypeScript',
+  'Next.js',
+  'Go',
+  'Python',
+  'pandas',
+  'NumPy',
+  'Node.js',
+  'NestJS',
+  'Socket.IO',
+  'PostgreSQL',
+  'MongoDB',
+  'Docker',
+  'Proxmox',
+  'RHEL',
+  'Git',
+  'GitHub Actions',
+  'Jenkins',
+  'Claude Code',
+  'Codex',
 ];
