@@ -2437,52 +2437,39 @@ html:has(.portfolio[data-motion='off']) {
   grid-template-areas: '. workspace .' 'source processing target';
 }
 
-/* The toolkit floats across the full left column, with no boxed stage. */
+/* One transparent technology strip at every breakpoint. */
 .experience-sidebar {
   min-width: 0;
-  position: relative;
-  isolation: isolate;
-}
-.experience-intro {
-  position: relative;
-  z-index: 2;
-  pointer-events: none;
-}
-.experience-intro h2,
-.experience-intro p {
-  text-shadow:
-    0 0 6px var(--page),
-    0 0 16px var(--page);
-}
-.experience-intro .text-link {
-  pointer-events: auto;
-  background: var(--page);
-  box-shadow: 0 0 12px 6px var(--page);
 }
 .experience-toolkit {
-  position: absolute;
-  inset: 0;
   min-width: 0;
-  z-index: 1;
+  margin-top: 32px;
 }
 .toolkit-stage {
   position: relative;
   width: 100%;
-  height: 100%;
+  height: 70px;
   overflow: hidden;
   background: transparent;
-}
-.experience-toolkit[data-mode='floating'] .toolkit-stage {
-  mask-image: linear-gradient(to bottom, #0004 0, #0004 190px, #000 350px);
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    #000 12%,
+    #000 88%,
+    transparent
+  );
 }
 .toolkit-track {
-  width: 100%;
-  padding: 12px;
+  display: flex;
+  gap: 32px;
+  padding: 12px 0;
+  width: max-content;
 }
 .toolkit-badges {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 32px;
   list-style: none;
   padding: 0;
   margin: 0;
@@ -2494,58 +2481,31 @@ html:has(.portfolio[data-motion='off']) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 10px;
   white-space: nowrap;
   color: var(--tech-tint);
-  background: color-mix(in srgb, var(--tech-tint) 9%, #111c2c);
-  border: 1px solid color-mix(in srgb, var(--tech-tint) 35%, #26364d);
-  border-radius: 8px;
-  font-size: 13px;
+  background: transparent;
+  border: 0;
+  padding: 8px 0;
+  font-size: 17px;
   line-height: 1;
   font-weight: 550;
-  padding: 12px 14px;
-  cursor: grab;
-  touch-action: none;
-  user-select: none;
 }
 .toolkit-badge svg {
-  width: 18px;
-  height: 18px;
+  width: 24px;
+  height: 24px;
   flex-shrink: 0;
 }
 .toolkit-badge svg:not([class]) {
   fill: currentColor;
 }
-.toolkit-stage[data-physics='ready'] .toolkit-badges li {
-  position: absolute;
-  top: 0;
-  left: 0;
-  will-change: transform;
-}
-.toolkit-stage[data-dragging='true'] .toolkit-badge {
-  cursor: grabbing;
-}
-.toolkit-stage:focus-visible,
-.toolkit-badge:focus-visible {
+.toolkit-stage:focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: -3px;
 }
-.experience-toolkit[data-mode='static'] {
-  position: relative;
-  margin-top: 32px;
-}
 .experience-toolkit[data-mode='static'] .toolkit-stage {
-  height: auto;
-}
-.experience-toolkit[data-mode='static'] .toolkit-badge {
-  cursor: default;
-}
-@media (min-width: 641px) and (max-width: 860px) {
-  .toolkit-badge {
-    font-size: 12px;
-    padding: 11px;
-    gap: 6px;
-  }
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 @media (max-width: 640px) {
   .experience-sidebar {
@@ -2559,46 +2519,17 @@ html:has(.portfolio[data-motion='off']) {
   }
   .experience-toolkit {
     order: 3;
-    position: relative;
-    inset: auto;
-    margin: 0;
-  }
-  .experience-toolkit[data-mode='static'] {
     margin: 0;
   }
   .toolkit-stage {
     height: 58px;
-    overflow: hidden;
-    mask-image: linear-gradient(
-      to right,
-      transparent,
-      #000 12%,
-      #000 88%,
-      transparent
-    );
-  }
-  .toolkit-track {
-    display: flex;
-    gap: 32px;
-    padding: 12px 0;
-    width: max-content;
-  }
-  .toolkit-badges {
-    flex-wrap: nowrap;
-    align-items: center;
-    gap: 32px;
   }
   .toolkit-badge {
-    background: transparent;
-    border: 0;
-    border-radius: 0;
-    padding: 8px 0;
+    gap: 8px;
     font-size: 14px;
-    cursor: default;
   }
-  .experience-toolkit[data-mode='static'] .toolkit-stage {
-    height: 58px;
-    overflow-x: auto;
-    scrollbar-width: none;
+  .toolkit-badge svg {
+    width: 18px;
+    height: 18px;
   }
 }

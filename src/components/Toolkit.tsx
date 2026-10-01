@@ -1,37 +1,17 @@
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { toolkit } from '../data/portfolio';
 import { TechnologyMark } from './TechTags';
 import { techStyle } from '../data/technologies';
-import { useToolkitPhysics } from '../hooks/useToolkitPhysics';
-
-const desktopQuery = '(min-width: 641px)';
-function subscribe(onChange: () => void) {
-  const media = window.matchMedia(desktopQuery);
-  media.addEventListener('change', onChange);
-  return () => media.removeEventListener('change', onChange);
-}
 
 export default function Toolkit({ motionEnabled }: { motionEnabled: boolean }) {
-  const desktop = useSyncExternalStore(
-    subscribe,
-    () => window.matchMedia(desktopQuery).matches,
-    () => false,
-  );
   const stage = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
-  const [activated, setActivated] = useState(false);
-  const physics = useToolkitPhysics(
-    stage,
-    desktop && motionEnabled && activated,
-    visible,
-  );
-  const autoScroll = !desktop && motionEnabled && visible;
+  const autoScroll = motionEnabled && visible;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         setVisible(entry.isIntersecting);
-        if (entry.isIntersecting) setActivated(true);
       },
       { threshold: 0.08 },
     );
@@ -74,54 +54,35 @@ export default function Toolkit({ motionEnabled }: { motionEnabled: boolean }) {
 
   useEffect(() => {
     if (stage.current) stage.current.scrollLeft = 0;
-  }, [desktop, motionEnabled]);
+  }, [motionEnabled]);
 
   return (
     <section
       className='experience-toolkit'
       aria-label='Technology toolkit'
-      data-mode={motionEnabled ? (desktop ? 'floating' : 'marquee') : 'static'}
+      data-mode={motionEnabled ? 'marquee' : 'static'}
     >
       <div
         ref={stage}
         className='toolkit-stage'
-        tabIndex={!desktop && !motionEnabled ? 0 : undefined}
-        role={!desktop && !motionEnabled ? 'group' : undefined}
-        aria-label={
-          !desktop && !motionEnabled ? 'Technology skills' : undefined
-        }
-        onPointerMove={physics.move}
-        onPointerUp={physics.end}
-        onPointerCancel={physics.end}
-        onPointerLeave={physics.leave}
+        tabIndex={!motionEnabled ? 0 : undefined}
+        role={!motionEnabled ? 'group' : undefined}
+        aria-label={!motionEnabled ? 'Technology skills' : undefined}
       >
         <div className='toolkit-track'>
           <ul
             className='toolkit-badges'
             aria-label='Technology skills and development tools'
           >
-            {toolkit.map((name, index) => (
+            {toolkit.map((name) => (
               <li key={name} style={techStyle(name)}>
-                {desktop && motionEnabled ? (
-                  <button
-                    className='toolkit-badge'
-                    aria-label={`Move ${name} badge`}
-                    aria-description='Drag to move, or use arrow keys.'
-                    onPointerDown={(event) => physics.start(index, event)}
-                    onLostPointerCapture={physics.end}
-                    onKeyDown={(event) => physics.key(index, event)}
-                  >
-                    <TechnologyMark name={name} />
-                  </button>
-                ) : (
-                  <span className='toolkit-badge'>
-                    <TechnologyMark name={name} />
-                  </span>
-                )}
+                <span className='toolkit-badge'>
+                  <TechnologyMark name={name} />
+                </span>
               </li>
             ))}
           </ul>
-          {!desktop && motionEnabled && (
+          {motionEnabled && (
             <ul className='toolkit-badges toolkit-copy' aria-hidden='true'>
               {toolkit.map((name) => (
                 <li key={name} style={techStyle(name)}>

@@ -544,135 +544,8 @@ test('company work and employment dates reflect the updated profile', async ({
   ).toHaveCount(0);
 });
 
-for (const width of [1440, 768]) {
-  test(`desktop toolkit floats across the column with drag and keyboard at ${width}px`, async ({
-    page,
-  }) => {
-    test.setTimeout(45000);
-    await page.setViewportSize({ width, height: 1000 });
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
-    const errors: string[] = [];
-    page.on('pageerror', (error) => errors.push(error.message));
-    await page.goto('/');
-    const stage = page.locator('.toolkit-stage');
-    await expect(stage).not.toHaveAttribute('data-physics', 'ready');
-    await expect(page.locator('.experience-item .tech-tags')).toHaveCount(0);
-    await stage.scrollIntoViewIfNeeded();
-    await expect(stage).toHaveAttribute('data-physics', 'ready');
-    const badges = stage.locator('.toolkit-badges:first-child li');
-    await expect(badges).toHaveCount(20);
-    const area = await stage.boundingBox();
-    const sidebar = await page.locator('.experience-sidebar').boundingBox();
-    if (!area || !sidebar) throw new Error('Missing toolkit area');
-    expect(area.height).toBeCloseTo(sidebar.height, 0);
-    expect(area.width).toBeCloseTo(sidebar.width, 0);
-    expect(
-      await stage.evaluate((el) => getComputedStyle(el).backgroundColor),
-    ).toBe('rgba(0, 0, 0, 0)');
-    await expect
-      .poll(() =>
-        badges.evaluateAll((items) => {
-          const area = document
-            .querySelector('.toolkit-stage')!
-            .getBoundingClientRect();
-          return items.every((item) => {
-            const rect = item.getBoundingClientRect();
-            return (
-              rect.top >= area.top - 8 &&
-              rect.bottom <= area.bottom + 8 &&
-              rect.left >= area.left - 8 &&
-              rect.right <= area.right + 8
-            );
-          });
-        }),
-      )
-      .toBe(true);
-    const distribution = await badges.evaluateAll((items) => {
-      const area = document
-        .querySelector('.toolkit-stage')!
-        .getBoundingClientRect();
-      return items.map(
-        (item) => (item.getBoundingClientRect().top - area.top) / area.height,
-      );
-    });
-    expect(Math.min(...distribution)).toBeLessThan(0.25);
-    expect(Math.max(...distribution)).toBeGreaterThan(0.7);
-    const beforeFloat = await badges.first().getAttribute('style');
-    await expect
-      .poll(() => badges.first().getAttribute('style'))
-      .not.toBe(beforeFloat);
-    // Choose an unobstructed badge below the introductory text, still on screen.
-    const index = await badges.evaluateAll((items) => {
-      const candidates = items.map((item, index) => ({
-        index,
-        rect: item.getBoundingClientRect(),
-      }));
-      const candidate = candidates.find(
-        ({ rect, index }) =>
-          rect.top > 350 &&
-          rect.bottom < innerHeight - 20 &&
-          document
-            .elementFromPoint(rect.x + rect.width / 2, rect.y + rect.height / 2)
-            ?.closest('li') === items[index],
-      );
-      if (!candidate) throw new Error('No unobstructed badge');
-      return candidate.index;
-    });
-    const badge = badges.nth(index).getByRole('button');
-    const original = await badge.boundingBox();
-    if (!original) throw new Error('Missing badge');
-    await page.mouse.move(
-      original.x + original.width / 2,
-      original.y + original.height / 2,
-    );
-    await page.mouse.down();
-    await expect(stage).toHaveAttribute('data-dragging', 'true');
-    await page.mouse.move(
-      original.x + original.width / 2,
-      original.y + original.height / 2 - 110,
-      { steps: 15 },
-    );
-    await expect
-      .poll(async () => (await badge.boundingBox())!.y)
-      .toBeLessThan(original.y - 30);
-    await page.mouse.up();
-    await expect(stage).not.toHaveAttribute('data-dragging');
-    await badge.focus();
-    const beforeKey = await badge.evaluate(
-      (el) => el.parentElement!.style.transform,
-    );
-    await page.keyboard.press('ArrowLeft');
-    await expect
-      .poll(() => badge.evaluate((el) => el.parentElement!.style.transform))
-      .not.toBe(beforeKey);
-    const linkedIn = page.locator('.experience-intro a');
-    await linkedIn.scrollIntoViewIfNeeded();
-    expect(
-      await linkedIn.evaluate((el) => {
-        const r = el.getBoundingClientRect();
-        return (
-          document
-            .elementFromPoint(r.x + r.width / 2, r.y + r.height / 2)
-            ?.closest('a') === el
-        );
-      }),
-    ).toBe(true);
-    await expect(
-      page.getByText('Tools I build with', { exact: true }),
-    ).toHaveCount(0);
-    await page.emulateMedia({ reducedMotion: 'reduce' });
-    await expect(stage).not.toHaveAttribute('data-physics');
-    await expect(stage.locator('button')).toHaveCount(0);
-    await expect(stage.getByText('Claude Code', { exact: true })).toBeVisible();
-    await expect(stage.getByText('Codex', { exact: true })).toBeVisible();
-    await page.emulateMedia({ reducedMotion: 'no-preference' });
-    await expect(stage).toHaveAttribute('data-physics', 'ready');
-    expect(errors).toEqual([]);
-  });
-}
-
-for (const width of [390, 320]) {
-  test(`mobile toolkit is a transparent one-line autoplay strip at ${width}px`, async ({
+for (const width of [1440, 768, 390, 320]) {
+  test(`toolkit is a transparent one-line autoplay strip at ${width}px`, async ({
     page,
   }) => {
     test.setTimeout(45000);
@@ -695,7 +568,22 @@ for (const width of [390, 320]) {
         .querySelector('.exploring-section')!
         .getBoundingClientRect().top,
     }));
-    expect(order.toolkit).toBeGreaterThanOrEqual(order.timeline);
+    if (width <= 640)
+      expect(order.toolkit).toBeGreaterThanOrEqual(order.timeline);
+    else {
+      const intro = await page.locator('.experience-intro').boundingBox();
+      const strip = await stage.boundingBox();
+      if (!intro || !strip) throw new Error('Missing introduction or strip');
+      expect(strip.y).toBeGreaterThanOrEqual(intro.y + intro.height);
+      expect(strip.width).toBeLessThan(width / 2);
+    }
+    expect(
+      await stage
+        .locator('.toolkit-badge')
+        .first()
+        .evaluate((el) => getComputedStyle(el).fontSize),
+    ).toBe(width > 640 ? '17px' : '14px');
+    await expect(stage.locator('button')).toHaveCount(0);
     expect(order.workbench).toBeGreaterThanOrEqual(order.toolkitEnd);
     await expect(stage).not.toHaveAttribute('data-physics');
     await expect(

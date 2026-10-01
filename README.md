@@ -1,6 +1,6 @@
 # Naufal Yassar's portfolio
 
-A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A compact carousel presents three Biaenergi-associated products with short descriptions, simplified system diagrams, and colored technology logos. Experience holds contribution and infrastructure details, alongside an overall toolkit with floating draggable badges throughout the left column on desktop and a transparent, single-line automatic strip with faded edges on mobile. The dark geometric background and transitions honor system reduced-motion preferences automatically. Enlarged diagrams use native dialogs with outside-click dismissal and sticky close controls.
+A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A compact carousel presents three Biaenergi-associated products with short descriptions, simplified system diagrams, and colored technology logos. Experience holds contribution and infrastructure details, alongside an overall toolkit with a transparent, single-line automatic strip with faded edges on desktop and mobile; desktop logos and names are slightly larger. The dark geometric background and transitions honor system reduced-motion preferences automatically. Enlarged diagrams use native dialogs with outside-click dismissal and sticky close controls.
 
 ## Run locally
 
@@ -20,7 +20,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite checks carousel selection and deep links, keyboard and swipe navigation, animated dismissal, outside-click and drag behavior, sticky close controls, keyboard focus, all workflow stages and navigation controls, exact section-divider alignment across breakpoints, updated employment dates, email copying and its failure path, responsive overflow, motion preferences, toolkit physics and keyboard interaction, single-line mobile autoplay and edge fades, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
+The browser suite checks carousel selection and deep links, keyboard and swipe navigation, animated dismissal, outside-click and drag behavior, sticky close controls, keyboard focus, all workflow stages and navigation controls, exact section-divider alignment across breakpoints, updated employment dates, email copying and its failure path, responsive overflow, motion preferences, single-line toolkit autoplay, reduced-motion keyboard scrolling, edge fades, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
 
 ## Build and host
 
