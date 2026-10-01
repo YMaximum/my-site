@@ -6,159 +6,51 @@ export const profile = {
   source: 'https://github.com/YMaximum/my-site',
 };
 
-export type ProjectId =
-  'integration' | 'analytics' | 'modeler' | 'diagrams' | 'obatin';
+export type ProjectId = 'integration' | 'analytics' | 'modeler';
 
 export interface Project {
   id: ProjectId;
   title: string;
   category: string;
+  association: string;
   summary: string;
   technologies: string[];
-  repository?: string;
-  context: string;
-  contribution: string;
-  decisions: { title: string; description: string }[];
-  outcome: string;
+  architecture: string;
 }
 
 export const projects: Project[] = [
   {
     id: 'integration',
-    title: 'Making complex data usable.',
-    category: 'Enterprise product',
+    title: 'Data integration platform',
+    category: 'Connect & prepare',
+    association: 'Biaenergi',
     summary:
-      'A data integration product that helps operators connect sources, shape data, and understand a load before running it.',
+      'Brings data from different sources into a usable destination, helping teams prepare reliable data for their work.',
     technologies: ['React', 'Python', 'PostgreSQL', 'Docker'],
-    context:
-      'Data integration involves more than moving rows. Operators need to understand their sources, configure mappings, see what will change, and run the product in their own environment.',
-    contribution:
-      'My work spans product decisions, operator interfaces, backend behavior, testing, and deployment tooling. I use an AI-assisted development workflow while taking responsibility for the decisions and the result.',
-    decisions: [
-      {
-        title: 'Make the next step clear.',
-        description:
-          'I worked on mapping, catalogs, pagination, and scheduling interfaces so the product follows the way an operator works.',
-      },
-      {
-        title: 'Show what a load would do.',
-        description:
-          'I contributed to a preview that compares a proposed load with its target, making the effect of an operation easier to inspect before proceeding.',
-      },
-      {
-        title: 'Own the path to installation.',
-        description:
-          'I worked on installation tooling and deployment configuration for on-premise environments, including operating constraints beyond a local development setup.',
-      },
-    ],
-    outcome:
-      'Operators can configure reusable data sources, inspect proposed changes, and use dedicated installation tooling. This summary describes my contributions without exposing company or client infrastructure.',
+    architecture:
+      'A web interface configures backend processing that reads source data, transforms it, and loads a target database.',
   },
   {
     id: 'analytics',
-    title: 'Turning data into understanding.',
-    category: 'FQ Analytical',
+    title: 'Industrial analytics platform',
+    category: 'Analyze & understand',
+    association: 'Biaenergi',
     summary:
-      'An analytical product connecting data exploration and statistical processing with interfaces people can work with.',
-    technologies: ['Python', 'pandas', 'NumPy', 'React', 'Next.js'],
-    context:
-      'Analytical tools need to connect numerical processing with a usable product. People need to explore their data, inspect results, and work through the questions those results raise.',
-    contribution:
-      'I work on FQ Analytical across its analytical capabilities and product interfaces. The product uses pandas, NumPy, and Python statistics libraries, alongside a React-based frontend.',
-    decisions: [
-      {
-        title: 'Connect analysis to the interface.',
-        description:
-          'I worked on data-population filters, chart empty states, and report previews and downloads, so people can explore and share analytical results.',
-      },
-      {
-        title: 'Keep results usable.',
-        description:
-          'My implementation work includes scientific-number formatting and handling errors in advanced-analysis results, alongside the product’s Python data-processing and statistics capabilities.',
-      },
-    ],
-    outcome:
-      'A company product that brings analytical processing and data exploration into a working interface. My contribution spans the analytical work and the product experience.',
+      'Turns operational data into statistical insights so teams can understand performance and make informed decisions.',
+    technologies: ['Next.js', 'Python', 'pandas', 'NumPy', 'Docker'],
+    architecture:
+      'An authenticated web app routes requests to analytical services. Source data is prepared as a graph for analysis; separate storage holds data, cached results, and reports.',
   },
   {
     id: 'modeler',
-    title: 'Modeling assets, together.',
-    category: 'FQ Modeler',
+    title: 'Collaborative asset editor',
+    category: 'Model & collaborate',
+    association: 'Biaenergi',
     summary:
-      'A real-time collaborative asset diagram editor. I spearheaded its development so people can work on a shared model together.',
-    technologies: ['React Flow', 'Yjs', 'WebSocket', 'NestJS', 'TypeScript'],
-    context:
-      'Asset diagrams represent relationships that teams need to work on together. A shared editor must keep diagram changes and collaborator presence connected across active sessions.',
-    contribution:
-      'I spearheaded the development of the collaborative asset editor, working across the React interface and NestJS backend. My implementation work includes shared state, WebSocket communication, and collaborator presence.',
-    decisions: [
-      {
-        title: 'Share the model, not just the screen.',
-        description:
-          'React Flow provides the diagram interface, while Yjs and WebSocket communication connect the shared state across collaborators.',
-      },
-      {
-        title: 'Keep collaboration in context.',
-        description:
-          'I worked on collaborator presence and canvas transitions, including cleaning up cursor state when someone leaves or changes their active canvas.',
-      },
-    ],
-    outcome:
-      'A collaborative asset modeling product with real-time shared editing and collaborator presence. I led this development as part of the company’s product team.',
-  },
-  {
-    id: 'diagrams',
-    title: 'A shared space for ideas.',
-    category: 'Collaboration experiment',
-    summary:
-      'An exploration of collaborative diagramming with shared nodes, live cursors, and session-based chat.',
-    technologies: ['Next.js', 'React Flow', 'Yjs', 'NestJS'],
-    repository: 'https://github.com/YMaximum/simple-diagrams-collaboration',
-    context:
-      'A diagram is useful when people can work on it together. This project explores a shared canvas alongside the conversations that give a diagram meaning.',
-    contribution:
-      'I explored connecting a React Flow canvas to shared Yjs state, with a NestJS and WebSocket backend for collaboration sessions.',
-    decisions: [
-      {
-        title: 'Give the canvas one shared state.',
-        description:
-          'Node and edge changes are reflected in Yjs maps, with observers updating the rendered canvas.',
-      },
-      {
-        title: 'Keep collaboration in context.',
-        description:
-          'The project includes session-based chat and cursor presence alongside the diagram rather than in a separate tool.',
-      },
-    ],
-    outcome:
-      'The repository brings together a shared canvas, collaboration sessions, and chat. It is an experiment in real-time product behavior, rather than a claim of a production service.',
-  },
-  {
-    id: 'obatin',
-    title: 'Connecting care and commerce.',
-    category: 'Healthcare team project',
-    summary:
-      'A healthcare platform bringing consultation and pharmacy commerce into one product, with a Go backend and React frontend.',
-    technologies: ['Go', 'Next.js', 'PostgreSQL', 'Docker'],
-    repository: 'https://github.com/YMaximum/obatin-healthcare-platform',
-    context:
-      'Healthcare products connect several different journeys: finding care, managing consultation, ordering products, and supporting the people operating the platform.',
-    contribution:
-      'I contributed to this team project. The repository covers the frontend, Go backend, database, and deployment setup; it represents collaborative work rather than sole authorship.',
-    decisions: [
-      {
-        title: 'Model different product journeys.',
-        description:
-          'The application separates user, doctor, partner, and administrator experiences, with consultation and pharmacy workflows.',
-      },
-      {
-        title: 'Build across the product boundary.',
-        description:
-          'The project combines a React frontend, a Go/Gin API, PostgreSQL, and Docker/Nginx infrastructure.',
-      },
-    ],
-    outcome:
-      'A full-stack team project covering consultation and commerce workflows. The public repository provides the implementation for closer inspection.',
+      'A shared diagram workspace for teams to model industrial assets and their relationships together in real time.',
+    technologies: ['React', 'TypeScript', 'Socket.IO', 'NestJS'],
+    architecture:
+      'Browser canvases exchange updates with a WebSocket backend. Yjs shared documents synchronize changes across collaborators, while a database persists the asset model.',
   },
 ];
 
@@ -227,14 +119,18 @@ export const experiences = [
     start: 'Jul 2025',
     end: 'Present',
     description:
-      'Working across data integration, FQ Analytical, and the FQ Modeler collaborative asset editor. I own product decisions, interfaces, backend work, and testing; handle client on-premise deployments and company server management; and am bringing practical AI workflows into the product team.',
+      'Build data integration and analytics products, spanning UX, full-stack development, and testing. Initiated the system design and early development of a collaborative asset editor. Bring practical AI workflows into the product team.',
+    responsibilities: [
+      'Handle client on-premise deployments and company server management, including Windows/Linux VMs and Proxmox high availability.',
+      'Improve product performance and maintain delivery pipelines with GitHub Actions and Jenkins.',
+    ],
     technologies: [
       'React',
       'TypeScript',
       'Python',
-      'NestJS',
-      'PostgreSQL',
       'Docker',
+      'Proxmox',
+      'RHEL',
     ],
   },
   {
@@ -244,7 +140,7 @@ export const experiences = [
     start: 'Aug 2024',
     end: 'Jul 2025',
     description:
-      'Joined Biaenergi on a contract before moving into a full-time role in July 2025. Contributed to company product development across interfaces, backend services, testing, and deployment.',
+      'Developed backend solutions around user needs, investigated reliability issues, and monitored on-premise servers before moving into a full-time role.',
   },
   {
     company: 'Sea Labs Indonesia',

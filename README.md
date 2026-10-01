@@ -1,6 +1,6 @@
 # Naufal Yassar's portfolio
 
-A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A dark palette, geometric background, and fluid transitions frame selected project case studies, an interactive development workflow, company analytics and asset-modeling work, experience, operational ownership, ongoing explorations, and contact links. A header control pauses motion; system reduced-motion preferences take priority. Case studies use native modal dialogs with outside-click dismissal and sticky close controls.
+A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A compact carousel presents three Biaenergi-associated products with short descriptions, simplified system diagrams, and colored technology logos. Experience holds contribution and infrastructure details. The dark geometric background and transitions honor both the header motion toggle and system reduced-motion preferences. Enlarged diagrams use native dialogs with outside-click dismissal and sticky close controls.
 
 ## Run locally
 
@@ -20,7 +20,7 @@ npx playwright install chromium
 npm run test:e2e
 ```
 
-The browser suite checks case-study deep links, animated dismissal, outside-click and drag behavior, sticky close controls, keyboard focus, all workflow stages and navigation controls, exact section-divider alignment across breakpoints, updated employment dates, email copying and its failure path, responsive overflow, motion preferences, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
+The browser suite checks carousel selection and deep links, keyboard and swipe navigation, animated dismissal, outside-click and drag behavior, sticky close controls, keyboard focus, all workflow stages and navigation controls, exact section-divider alignment across breakpoints, updated employment dates, email copying and its failure path, responsive overflow, motion preferences, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
 
 ## Build and host
 
@@ -33,12 +33,12 @@ The output is in `dist/` and can be served by a static host. No server, API cred
 
 ## Edit the content
 
-- `src/data/portfolio.ts`: profile links, project case studies, AI workflow stages, and experience.
+- `src/data/portfolio.ts`: profile links, project summaries, AI workflow stages, and experience.
 - `src/App.tsx`: page sections and navigation.
-- `src/components/`: conceptual illustrations, case-study dialog, and workflow explorer.
+- `src/components/`: system diagrams, technology badges, carousel, native dialog, and workflow explorer.
 - `src/index.css`: layout, design tokens, typography, and responsive styles.
 - `index.html` and `public/favicon.svg`: metadata and site identity.
 
-Company work is summarized at a high level. Public project illustrations are labeled as concepts; they are not screenshots. OpenClaw and VPS automation are presented as explorations. Case studies and workflow stages support `?project=diagrams` and `?stage=review` links.
+Company work is summarized without proprietary product names or infrastructure identifiers. Diagrams are simplified flows, not product screenshots. OpenClaw and VPS automation remain explorations. Carousel selection, enlarged diagrams, and workflow stages support `?work=analytics`, `?project=modeler`, and `?stage=review` links. Fonts and technology SVGs are bundled locally; brand marks are supplied by Simple Icons.
 
 The design brief is in `docs/portfolio/implementation-brief.md`. Reviewed design instructions and their pinned sources are in `.agents/skills/`.

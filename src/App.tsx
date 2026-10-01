@@ -3,7 +3,8 @@ import Icon from './components/Icons';
 import MotionEffects from './components/MotionEffects';
 import { useMotionPreference } from './hooks/useMotionPreference';
 import ProjectDialog from './components/ProjectDialog';
-import ProjectVisual from './components/ProjectVisual';
+import ProjectCarousel from './components/ProjectCarousel';
+import TechTags from './components/TechTags';
 import Workflow from './components/Workflow';
 import { experiences, profile, projects, workflow } from './data/portfolio';
 import type { ProjectId } from './data/portfolio';
@@ -23,7 +24,14 @@ function readPageState() {
   const project = projects.find(
     (item) => item.id === parameters.get('project'),
   );
-  return { stage: Math.max(stage, 0), project: project?.id ?? null };
+  const work = projects.findIndex(
+    (item) => item.id === (parameters.get('work') ?? project?.id),
+  );
+  return {
+    stage: Math.max(stage, 0),
+    project: project?.id ?? null,
+    work: Math.max(work, 0),
+  };
 }
 
 export default function App() {
@@ -36,7 +44,6 @@ export default function App() {
   const copyTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const selectedProject =
     projects.find((project) => project.id === pageState.project) ?? null;
-  const flagship = projects[0];
 
   useEffect(() => {
     const target = document.getElementById(window.location.hash.slice(1));
@@ -82,6 +89,8 @@ export default function App() {
   ) {
     const next = { ...pageState, ...patch };
     const url = new URL(window.location.href);
+    if (next.work > 0) url.searchParams.set('work', projects[next.work].id);
+    else url.searchParams.delete('work');
     if (next.project) url.searchParams.set('project', next.project);
     else url.searchParams.delete('project');
     if (next.stage > 0) url.searchParams.set('stage', workflow[next.stage].id);
@@ -92,7 +101,10 @@ export default function App() {
   }
 
   function openProject(id: ProjectId) {
-    updatePageState({ project: id }, 'push');
+    updatePageState(
+      { project: id, work: projects.findIndex((item) => item.id === id) },
+      'push',
+    );
   }
 
   function closeProject() {
@@ -280,87 +292,11 @@ export default function App() {
               More on GitHub <Icon name='ArrowUpRight' size={17} />
             </a>
           </div>
-          <article className='flagship-project' data-reveal>
-            <div className='flagship-copy'>
-              <span className='project-category'>{flagship.category}</span>
-              <h3>{flagship.title}</h3>
-              <p>{flagship.summary}</p>
-              <div className='project-role'>
-                <span>My focus</span>
-                <p>
-                  Product thinking, operator UX,
-                  <br />
-                  full-stack development & delivery.
-                </p>
-              </div>
-              <ul className='tech-list' aria-label='Technologies'>
-                {flagship.technologies.map((tech) => (
-                  <li key={tech}>{tech}</li>
-                ))}
-              </ul>
-              <button
-                className='button button-primary'
-                onClick={() => openProject(flagship.id)}
-              >
-                Read the case study <Icon name='ArrowUpRight' size={18} />
-              </button>
-            </div>
-            <ProjectVisual project='integration' />
-          </article>
-          <div className='operations-note' data-reveal>
-            <span className='operations-icon'>
-              <Icon name='Server' size={24} />
-            </span>
-            <div>
-              <h3>Ownership beyond the code</h3>
-              <p>
-                I also handle client on-premise deployments and manage our
-                company’s on-premise servers. Delivery includes the environment
-                where the product actually runs.
-              </p>
-            </div>
-          </div>
-          <div className='project-grid'>
-            {projects.slice(1).map((project) => (
-              <article
-                className='secondary-project'
-                key={project.id}
-                data-reveal
-              >
-                <ProjectVisual project={project.id} />
-                <div className='secondary-project-copy'>
-                  <span className='project-category'>{project.category}</span>
-                  <h3>{project.title}</h3>
-                  <p>{project.summary}</p>
-                  <ul className='tech-list' aria-label='Technologies'>
-                    {project.technologies.map((tech) => (
-                      <li key={tech}>{tech}</li>
-                    ))}
-                  </ul>
-                  <div className='project-actions'>
-                    <button
-                      className='text-button'
-                      onClick={() => openProject(project.id)}
-                      aria-label={`Read the ${project.category.toLowerCase()} case study`}
-                    >
-                      Explore the project <Icon name='ArrowUpRight' size={17} />
-                    </button>
-                    {project.repository && (
-                      <a
-                        className='icon-button'
-                        href={project.repository}
-                        target='_blank'
-                        rel='noreferrer'
-                        aria-label={`View the ${project.category.toLowerCase()} source on GitHub`}
-                      >
-                        <Icon name='Github' size={19} />
-                      </a>
-                    )}
-                  </div>
-                </div>
-              </article>
-            ))}
-          </div>
+          <ProjectCarousel
+            index={pageState.work}
+            onChange={(work) => updatePageState({ work })}
+            onOpen={openProject}
+          />
         </section>
 
         <section
@@ -450,15 +386,18 @@ export default function App() {
                 <p className='experience-description'>
                   {experience.description}
                 </p>
-                {experience.technologies && (
-                  <ul
-                    className='tech-list experience-stack'
-                    aria-label='Tools I work with'
-                  >
-                    {experience.technologies.map((tech) => (
-                      <li key={tech}>{tech}</li>
+                {experience.responsibilities && (
+                  <ul className='experience-responsibilities'>
+                    {experience.responsibilities.map((item) => (
+                      <li key={item}>{item}</li>
                     ))}
                   </ul>
+                )}
+                {experience.technologies && (
+                  <TechTags
+                    technologies={experience.technologies}
+                    label='Tools I work with'
+                  />
                 )}
               </article>
             ))}

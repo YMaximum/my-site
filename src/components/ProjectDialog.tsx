@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../data/portfolio';
 import Icon from './Icons';
+import SystemDiagram from './SystemDiagram';
+import TechTags from './TechTags';
 
 function animateClose(element: HTMLDialogElement, enabled: boolean) {
   if (!element.open || element.dataset.closing) return null;
@@ -105,7 +107,7 @@ export default function ProjectDialog({
             </span>
             <button
               className='icon-button dialog-close'
-              aria-label='Close case study'
+              aria-label='Close system diagram'
               onClick={requestClose}
             >
               <Icon name='X' size={22} />
@@ -114,49 +116,16 @@ export default function ProjectDialog({
           <div className='dialog-content'>
             <h2 id='case-study-title'>{displayedProject.title}</h2>
             <p className='dialog-summary'>{displayedProject.summary}</p>
-            <ul className='tech-list' aria-label='Technologies'>
-              {displayedProject.technologies.map((tech) => (
-                <li key={tech}>{tech}</li>
-              ))}
-            </ul>
+            <p className='project-association'>
+              Associated with {displayedProject.association}
+            </p>
+            <SystemDiagram project={displayedProject.id} />
             <div className='case-study-section'>
-              <h3>The problem</h3>
-              <p>{displayedProject.context}</p>
+              <h3>System flow</h3>
+              <p>{displayedProject.architecture}</p>
             </div>
-            <div className='case-study-section'>
-              <h3>My contribution</h3>
-              <p>{displayedProject.contribution}</p>
-            </div>
-            <div className='case-study-section'>
-              <h3>The decisions</h3>
-              <div className='case-decisions'>
-                {displayedProject.decisions.map((decision) => (
-                  <div key={decision.title}>
-                    <Icon name='Check' size={18} />
-                    <div>
-                      <h4>{decision.title}</h4>
-                      <p>{decision.description}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-            <div className='case-study-section case-outcome'>
-              <h3>The result</h3>
-              <p>{displayedProject.outcome}</p>
-            </div>
+            <TechTags technologies={displayedProject.technologies} />
             <div className='dialog-actions'>
-              {displayedProject.repository && (
-                <a
-                  className='button button-primary'
-                  href={displayedProject.repository}
-                  target='_blank'
-                  rel='noreferrer'
-                >
-                  <Icon name='Github' size={18} /> Explore the repository{' '}
-                  <Icon name='ArrowUpRight' size={16} />
-                </a>
-              )}
               <button className='text-button' onClick={requestClose}>
                 Back to selected work <Icon name='ArrowRight' size={17} />
               </button>

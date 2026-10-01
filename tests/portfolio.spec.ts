@@ -7,14 +7,14 @@ test('case studies support links, Escape, focus return, and browser Back', async
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   const trigger = page.getByRole('button', {
-    name: 'Read the case study',
+    name: 'Enlarge data integration platform system diagram',
     exact: true,
   });
   await trigger.click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page).toHaveURL(/project=integration/);
   await expect(
-    page.getByRole('heading', { name: 'My contribution' }),
+    page.getByRole('heading', { name: 'System flow' }),
   ).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -25,22 +25,14 @@ test('case studies support links, Escape, focus return, and browser Back', async
   await page.goBack();
   await expect(page.getByRole('dialog')).not.toBeVisible();
 
-  await page.goto('/?project=diagrams');
+  await page.goto('/?project=modeler');
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(
     page
       .getByRole('dialog')
-      .getByRole('heading', { name: 'A shared space for ideas.' }),
+      .getByRole('heading', { name: 'Collaborative asset editor' }),
   ).toBeVisible();
-  await expect(
-    page
-      .getByRole('dialog')
-      .getByRole('link', { name: 'Explore the repository' }),
-  ).toHaveAttribute(
-    'href',
-    'https://github.com/YMaximum/simple-diagrams-collaboration',
-  );
-  await page.getByRole('button', { name: 'Close case study' }).click();
+  await page.getByRole('button', { name: 'Close system diagram' }).click();
   await expect(page.getByRole('dialog')).not.toBeVisible();
 });
 
@@ -130,8 +122,27 @@ for (const width of [1440, 768, 390, 320]) {
         })),
       })),
     ).toEqual([]);
+    for (const title of [
+      'Industrial analytics platform',
+      'Collaborative asset editor',
+      'Data integration platform',
+    ]) {
+      await page
+        .getByRole('button', { name: `Show ${title.toLowerCase()}` })
+        .click();
+      expect(
+        await page.evaluate(() => document.documentElement.scrollWidth),
+      ).toBeLessThanOrEqual(width);
+      const audit = await new AxeBuilder({ page })
+        .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
+        .analyze();
+      expect(audit.violations.map((item) => item.id)).toEqual([]);
+    }
     await page
-      .getByRole('button', { name: 'Read the case study', exact: true })
+      .getByRole('button', {
+        name: 'Enlarge data integration platform system diagram',
+        exact: true,
+      })
       .click();
     const dialogAudit = await new AxeBuilder({ page })
       .withTags(['wcag2a', 'wcag2aa', 'wcag21aa'])
@@ -148,7 +159,7 @@ for (const width of [1440, 768, 390, 320]) {
     await expect(
       page
         .getByRole('dialog')
-        .getByRole('button', { name: 'Close case study' }),
+        .getByRole('button', { name: 'Close system diagram' }),
     ).toBeFocused();
     await page.keyboard.press('Escape');
     await page.keyboard.press('Tab');
@@ -178,18 +189,18 @@ for (const width of [1440, 390]) {
   test(`dialog outside click and sticky close control at ${width}px`, async ({
     page,
   }) => {
-    await page.setViewportSize({ width, height: 700 });
+    await page.setViewportSize({ width, height: 400 });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     const trigger = page.getByRole('button', {
-      name: 'Read the case study',
+      name: 'Enlarge data integration platform system diagram',
       exact: true,
     });
     const dialog = page.getByRole('dialog');
-    const close = page.getByRole('button', { name: 'Close case study' });
+    const close = page.getByRole('button', { name: 'Close system diagram' });
     await trigger.click();
     await dialog
-      .getByRole('heading', { name: 'The problem', exact: true })
+      .getByRole('heading', { name: 'System flow', exact: true })
       .click();
     await expect(dialog).toBeVisible();
 
@@ -327,24 +338,88 @@ for (const width of [1440, 390]) {
   });
 }
 
-test('all project buttons open their case study and the return action closes it', async ({
+test('carousel selection, keyboard navigation, deep links, and diagram actions work', async ({
   page,
 }) => {
   await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await page.goto('/');
-  for (const [label, id] of [
-    ['Read the case study', 'integration'],
-    ['Read the fq analytical case study', 'analytics'],
-    ['Read the fq modeler case study', 'modeler'],
-    ['Read the collaboration experiment case study', 'diagrams'],
-    ['Read the healthcare team project case study', 'obatin'],
+  await page.goto('/#work');
+  const carousel = page.getByRole('region', { name: 'Company projects' });
+  for (const [title, id] of [
+    ['Data integration platform', 'integration'],
+    ['Industrial analytics platform', 'analytics'],
+    ['Collaborative asset editor', 'modeler'],
   ]) {
-    await page.getByRole('button', { name: label, exact: true }).click();
+    const tab = carousel.getByRole('button', {
+      name: `Show ${title.toLowerCase()}`,
+    });
+    await tab.click();
+    await expect(tab).toHaveAttribute('aria-pressed', 'true');
+    await expect(
+      carousel.getByRole('heading', { name: title, exact: true }),
+    ).toBeVisible();
+    await expect(carousel).toContainText('Associated with Biaenergi');
+    await carousel
+      .getByRole('button', {
+        name: `Enlarge ${title.toLowerCase()} system diagram`,
+      })
+      .click();
     await expect(page).toHaveURL(new RegExp(`project=${id}`));
     await expect(page.getByRole('dialog')).toBeVisible();
     await page.getByRole('button', { name: 'Back to selected work' }).click();
     await expect(page.getByRole('dialog')).not.toBeVisible();
   }
+  await carousel
+    .getByRole('button', { name: 'Next project', exact: true })
+    .click();
+  await expect(carousel.getByRole('heading')).toHaveText(
+    'Data integration platform',
+  );
+  await carousel.getByRole('button', { name: 'Previous project' }).click();
+  await expect(carousel.getByRole('heading')).toHaveText(
+    'Collaborative asset editor',
+  );
+  await page.keyboard.press('ArrowLeft');
+  await expect(carousel.getByRole('heading')).toHaveText(
+    'Industrial analytics platform',
+  );
+  await page.reload();
+  await expect(carousel.getByRole('heading')).toHaveText(
+    'Industrial analytics platform',
+  );
+  await expect(carousel.locator('.tech-tags li svg')).toHaveCount(5);
+  await expect(page.locator('body')).not.toContainText(
+    /FQ Analytical|FQ Modeler|Flowqount|Collaboration experiment|Healthcare team project/i,
+  );
+});
+
+test('mobile carousel swipes change projects while vertical gestures preserve selection', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/#work');
+  const slide = page.locator('#project-slide');
+  await slide.dispatchEvent('touchstart', {
+    touches: [{ identifier: 0, clientX: 300, clientY: 350 }],
+  });
+  await slide.dispatchEvent('touchend', {
+    changedTouches: [{ identifier: 0, clientX: 100, clientY: 370 }],
+  });
+  await expect(slide.getByRole('heading')).toHaveText(
+    'Industrial analytics platform',
+  );
+  await slide.dispatchEvent('touchstart', {
+    touches: [{ identifier: 0, clientX: 300, clientY: 350 }],
+  });
+  await slide.dispatchEvent('touchend', {
+    changedTouches: [{ identifier: 0, clientX: 200, clientY: 550 }],
+  });
+  await expect(slide.getByRole('heading')).toHaveText(
+    'Industrial analytics platform',
+  );
+  await page.getByRole('button', { name: 'Next project', exact: true }).click();
+  await expect(slide.getByRole('heading')).toHaveText(
+    'Collaborative asset editor',
+  );
 });
 
 test('navigation, contact links, and unavailable clipboard remain useful', async ({
@@ -444,7 +519,7 @@ for (const width of [1440, 768, 390, 320]) {
     // Direct section URLs use the same offset, including the final section.
     await page.goto('/#contact');
     await expectAligned('contact');
-    await page.setViewportSize({ width, height: 700 });
+    await page.setViewportSize({ width, height: 400 });
     await page.reload();
     await expectAligned('contact');
   });
@@ -470,12 +545,12 @@ test('company work and employment dates reflect the updated profile', async ({
       dialog.getByRole('link', { name: 'Explore the repository' }),
     ).toHaveCount(0);
     await expect(
-      dialog.getByRole('heading', { name: 'My contribution' }),
+      dialog.getByRole('heading', { name: 'System flow' }),
     ).toBeVisible();
-    await page.getByRole('button', { name: 'Close case study' }).click();
+    await page.getByRole('button', { name: 'Close system diagram' }).click();
     await expect(dialog).not.toBeVisible();
   }
   await expect(
     page.getByRole('link', { name: /source on GitHub/ }),
-  ).toHaveCount(2);
+  ).toHaveCount(0);
 });

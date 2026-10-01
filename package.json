@@ -19,7 +19,8 @@
     "@fontsource-variable/manrope": "^5.2.0",
     "lucide-react": "^0.577.0",
     "react": "^19.3.0",
-    "react-dom": "^19.3.0"
+    "react-dom": "^19.3.0",
+    "simple-icons": "^16.33.0"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
