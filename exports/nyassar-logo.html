@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#0b111d">
+<title>Download your Nyassar logo</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#0b111d;color:#edf2fa}
+*{box-sizing:border-box}body{margin:0;min-height:100svh;display:grid;place-items:center;padding:24px}
+main{width:min(100%,380px);text-align:center}h1{font-size:24px;margin:0 0 12px}
+p{color:#abb8cc;line-height:1.6}svg{display:block;width:min(100%,300px);height:auto;margin:24px auto}
+.actions{display:grid;gap:12px}.button{display:block;border:1px solid #9ab9ff;background:#9ab9ff;color:#0b111d;border-radius:12px;padding:15px;font:inherit;font-weight:650;text-decoration:none;cursor:pointer}
+.secondary{background:transparent;color:#9ab9ff}.button[aria-disabled="true"]{opacity:.55;pointer-events:none}
+.button:focus-visible{outline:3px solid white;outline-offset:4px}small{display:block;margin-top:20px;color:#abb8cc;line-height:1.6}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<h1>Your Nyassar logo</h1>
+<p>Ready for your profile picture.</p>
+<svg role="img" aria-label="Nyassar logo" xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <rect width="64" height="64" rx="16" fill="#182338"/>
+  <path d="M14 43V24h6v3c2-3 5-4 8-4 6 0 8 4 8 10v10h-6V33c0-4-1-5-4-5-4 0-6 2-6 6v9h-6Z" fill="#fff"/>
+  <path d="m36 24 6 14 6-14h6L43 50h-6l3-8-10-18h6Z" fill="#fff"/>
+  <circle cx="53" cy="48" r="3" fill="#7da0ff"/>
+</svg>
+
+<div class="actions">
+<a id="png" class="button" aria-disabled="true">Preparing PNG…</a>
+<button id="share" class="button secondary" hidden>Save or share image</button>
+<a id="vector" class="button secondary" download="nyassar-logo.svg">Download SVG</a>
+</div>
+<small id="status" aria-live="polite">PNG: 1024 × 1024 pixels. SVG: resizable vector.<br>If your browser opens the PNG, use its Save Image or Share option.</small>
+</main>
+<script>
+const original = document.querySelector('svg');
+const svgBlob = new Blob([new XMLSerializer().serializeToString(original)], { type: 'image/svg+xml' });
+const svgUrl = URL.createObjectURL(svgBlob);
+document.querySelector('#vector').href = svgUrl;
+const picture = new Image();
+const status = document.querySelector('#status');
+picture.onerror = () => { status.textContent = 'The PNG could not load. You can still download the SVG.'; };
+picture.onload = () => {
+  const canvas = document.createElement('canvas');
+  canvas.width = canvas.height = 1024;
+  const context = canvas.getContext('2d');
+  if (!context) { status.textContent = 'PNG export is unavailable in this browser. You can still download the SVG.'; return; }
+  context.drawImage(picture, 0, 0, 1024, 1024);
+  canvas.toBlob(blob => {
+    if (!blob) { status.textContent = 'PNG export failed. You can still download the SVG.'; return; }
+    const link = document.querySelector('#png');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'nyassar-logo-1024.png';
+    link.removeAttribute('aria-disabled');
+    link.textContent = 'Download PNG';
+    const file = new File([blob], 'nyassar-logo-1024.png', { type: 'image/png' });
+    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+      const share = document.querySelector('#share');
+      share.hidden = false;
+      share.onclick = async () => {
+        try { await navigator.share({ files: [file] }); }
+        catch (error) { if (error.name !== 'AbortError') status.textContent = 'Use Download PNG to save your image.'; }
+      };
+    }
+  }, 'image/png');
+};
+picture.src = svgUrl;
+</script>
+</body>
+</html>
