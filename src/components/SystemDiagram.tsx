@@ -18,6 +18,9 @@ function Node({
       {className.includes('bidirectional') && (
         <i className='flow-return' aria-hidden='true' />
       )}
+      {className.includes('arrow-') && (
+        <i className='flow-pulse' aria-hidden='true' />
+      )}
       <strong>{name}</strong>
       <span>{detail}</span>
     </div>

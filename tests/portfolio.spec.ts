@@ -7,14 +7,16 @@ test('case studies support links, Escape, focus return, and browser Back', async
   await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.goto('/');
   const trigger = page.getByRole('button', {
-    name: 'Enlarge data integration platform system diagram',
+    name: 'Preview data integration platform system diagram',
     exact: true,
   });
   await trigger.click();
   await expect(page.getByRole('dialog')).toBeVisible();
   await expect(page).toHaveURL(/project=integration/);
   await expect(
-    page.getByRole('heading', { name: 'System flow' }),
+    page
+      .getByRole('dialog')
+      .getByRole('heading', { name: 'Data integration platform' }),
   ).toBeVisible();
   await page.keyboard.press('Escape');
   await expect(page.getByRole('dialog')).not.toBeVisible();
@@ -127,9 +129,14 @@ for (const width of [1440, 768, 390, 320]) {
       'Collaborative asset editor',
       'Data integration platform',
     ]) {
-      await page
-        .getByRole('button', { name: `Show ${title.toLowerCase()}` })
-        .click();
+      if (width <= 640)
+        await page
+          .getByRole('combobox', { name: 'Choose a project' })
+          .selectOption({ label: title });
+      else
+        await page
+          .getByRole('button', { name: `Show ${title.toLowerCase()}` })
+          .click();
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),
       ).toBeLessThanOrEqual(width);
@@ -140,7 +147,7 @@ for (const width of [1440, 768, 390, 320]) {
     }
     await page
       .getByRole('button', {
-        name: 'Enlarge data integration platform system diagram',
+        name: 'Preview data integration platform system diagram',
         exact: true,
       })
       .click();
@@ -186,48 +193,42 @@ test('contact copy reports success and reduced motion disables smooth scrolling'
 });
 
 for (const width of [1440, 390]) {
-  test(`dialog outside click and sticky close control at ${width}px`, async ({
+  test(`diagram preview keeps close controls visible and supports backdrop dismissal at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 400 });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.goto('/');
     const trigger = page.getByRole('button', {
-      name: 'Enlarge data integration platform system diagram',
+      name: 'Preview data integration platform system diagram',
       exact: true,
     });
     const dialog = page.getByRole('dialog');
     const close = page.getByRole('button', { name: 'Close system diagram' });
     await trigger.click();
-    await dialog
-      .getByRole('heading', { name: 'System flow', exact: true })
-      .click();
-    await expect(dialog).toBeVisible();
-
-    // A drag that starts in the content must not be mistaken for a backdrop click.
-    const bounds = await dialog.boundingBox();
-    if (!bounds) throw new Error('Missing dialog bounds');
-    await page.mouse.move(bounds.x + 40, bounds.y + 95);
+    const canvas = dialog.getByRole('region', {
+      name: 'System diagram canvas',
+    });
+    await expect(canvas).toBeVisible();
+    await expect(
+      dialog.locator('.dialog-summary, .tech-tags, .case-study-section'),
+    ).toHaveCount(0);
+    const bounds = await canvas.boundingBox();
+    if (!bounds) throw new Error('Missing canvas bounds');
+    // Pointer capture keeps a canvas drag from becoming a backdrop click.
+    await page.mouse.move(bounds.x + 40, bounds.y + 30);
     await page.mouse.down();
     await page.mouse.move(4, 350);
     await page.mouse.up();
     await expect(dialog).toBeVisible();
-
-    await dialog.evaluate((element) => {
-      element.scrollTop = element.scrollHeight;
-    });
-    expect(
-      await dialog.evaluate((element) => element.scrollTop),
-    ).toBeGreaterThan(100);
+    await expect(canvas).toHaveAttribute('data-dragging', 'false');
     await expect(close).toBeInViewport({ ratio: 1 });
-    const closeBounds = await close.boundingBox();
-    const scrolledBounds = await dialog.boundingBox();
-    expect(closeBounds!.y).toBeGreaterThanOrEqual(scrolledBounds!.y);
-    expect(closeBounds!.y).toBeLessThan(scrolledBounds!.y + 30);
+    await expect(page.getByRole('button', { name: 'Zoom in' })).toBeInViewport({
+      ratio: 1,
+    });
     await close.click();
     await expect(dialog).not.toBeVisible();
     await expect(trigger).toBeFocused();
-
     await trigger.click();
     await page.mouse.click(4, 350);
     await expect(dialog).not.toBeVisible();
@@ -349,12 +350,12 @@ test('carousel selection, keyboard navigation, deep links, and diagram actions w
     await expect(carousel).toContainText('Associated with Biaenergi');
     await carousel
       .getByRole('button', {
-        name: `Enlarge ${title.toLowerCase()} system diagram`,
+        name: `Preview ${title.toLowerCase()} system diagram`,
       })
       .click();
     await expect(page).toHaveURL(new RegExp(`project=${id}`));
     await expect(page.getByRole('dialog')).toBeVisible();
-    await page.getByRole('button', { name: 'Back to selected work' }).click();
+    await page.getByRole('button', { name: 'Close system diagram' }).click();
     await expect(page.getByRole('dialog')).not.toBeVisible();
   }
   await carousel
@@ -407,7 +408,20 @@ test('mobile carousel swipes change projects while vertical gestures preserve se
   await expect(slide.getByRole('heading')).toHaveText(
     'Industrial analytics platform',
   );
-  await page.getByRole('button', { name: 'Next project', exact: true }).click();
+  await expect(
+    page.getByRole('button', { name: 'Next project', exact: true }),
+  ).not.toBeVisible();
+  await expect(
+    page.getByRole('button', { name: 'Show industrial analytics platform' }),
+  ).not.toBeVisible();
+  const dropdown = page.getByRole('combobox', { name: 'Choose a project' });
+  await expect(dropdown).toHaveValue('analytics');
+  await dropdown.selectOption('modeler');
+  await expect(slide.getByRole('heading')).toHaveText(
+    'Collaborative asset editor',
+  );
+  await page.reload();
+  await expect(dropdown).toHaveValue('modeler');
   await expect(slide.getByRole('heading')).toHaveText(
     'Collaborative asset editor',
   );
@@ -536,7 +550,7 @@ test('company work and employment dates reflect the updated profile', async ({
       dialog.getByRole('link', { name: 'Explore the repository' }),
     ).toHaveCount(0);
     await expect(
-      dialog.getByRole('heading', { name: 'System flow' }),
+      dialog.getByRole('region', { name: 'System diagram canvas' }),
     ).toBeVisible();
     await page.getByRole('button', { name: 'Close system diagram' }).click();
     await expect(dialog).not.toBeVisible();
