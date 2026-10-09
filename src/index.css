@@ -2533,3 +2533,60 @@ html:has(.portfolio[data-motion='off']) {
     height: 18px;
   }
 }
+
+/* Before hydration, the generated HTML remains a readable static portfolio. */
+.carousel-card[hidden] {
+  display: none;
+}
+.portfolio[data-interactive='false'] .carousel-toolbar,
+.portfolio[data-interactive='false'] .carousel-progress,
+.portfolio[data-interactive='false'] .carousel-copy button,
+.portfolio[data-interactive='false'] .menu-toggle,
+.portfolio[data-interactive='false'] .workflow-steps,
+.portfolio[data-interactive='false'] .copy-button {
+  display: none;
+}
+.portfolio[data-interactive='false'] #project-slide {
+  display: grid;
+  gap: 24px;
+}
+.portfolio[data-interactive='false'] .main-navigation {
+  position: static;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+.portfolio[data-interactive='false'] *,
+.portfolio[data-interactive='false'] *::before,
+.portfolio[data-interactive='false'] *::after {
+  animation: none !important;
+}
+
+.portfolio[data-interactive='false'] .workflow {
+  grid-template-columns: 1fr;
+}
+.portfolio[data-interactive='false'] .workflow-panel {
+  border-left: 0;
+}
+
+@media (max-width: 700px) {
+  .portfolio[data-interactive='false'] .site-header {
+    position: static;
+  }
+  .portfolio[data-interactive='false'] .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding-block: 16px;
+    row-gap: 16px;
+  }
+  .portfolio[data-interactive='false'] .main-navigation {
+    order: 3;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+}

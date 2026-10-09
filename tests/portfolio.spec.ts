@@ -375,7 +375,9 @@ test('carousel selection, keyboard navigation, deep links, and diagram actions w
   await expect(carousel.getByRole('heading')).toHaveText(
     'Industrial analytics platform',
   );
-  await expect(carousel.locator('.tech-tags li svg')).toHaveCount(5);
+  await expect(
+    carousel.locator('.carousel-card:not([hidden]) .tech-tags li svg'),
+  ).toHaveCount(5);
   await expect(page.locator('body')).not.toContainText(
     /FQ Analytical|FQ Modeler|Flowqount|Collaboration experiment|Healthcare team project/i,
   );

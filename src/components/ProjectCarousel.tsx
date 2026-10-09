@@ -6,16 +6,17 @@ import TechTags from './TechTags';
 
 export default function ProjectCarousel({
   index,
+  interactive,
   onChange,
   onOpen,
 }: {
   index: number;
+  interactive: boolean;
   onChange: (index: number) => void;
   onOpen: (id: ProjectId) => void;
 }) {
   const [direction, setDirection] = useState(1);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const project = projects[index];
   function select(next: number, direction: number) {
     setDirection(direction);
     onChange((next + projects.length) % projects.length);
@@ -24,7 +25,7 @@ export default function ProjectCarousel({
     <div
       className='project-carousel'
       role='region'
-      aria-roledescription='carousel'
+      aria-roledescription={interactive ? 'carousel' : undefined}
       aria-label='Company projects'
       onKeyDown={(event) => {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
@@ -90,34 +91,41 @@ export default function ProjectCarousel({
             select(index + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
         }}
       >
-        <article
-          key={project.id}
-          className={`carousel-card ${direction < 0 ? 'from-left' : ''}`}
-          role='group'
-          aria-roledescription='slide'
-          aria-label={`${index + 1} of ${projects.length}`}
-        >
-          <div className='carousel-copy'>
-            <span className='project-category'>{project.category}</span>
-            <h3>{project.title}</h3>
-            <p className='project-purpose'>{project.summary}</p>
-            <p className='project-association'>
-              Associated with <strong>{project.association}</strong>
-            </p>
-            <TechTags technologies={project.technologies} />
-            <button
-              className='text-button'
-              onClick={() => onOpen(project.id)}
-              aria-label={`Enlarge ${project.title.toLowerCase()} system diagram`}
-            >
-              Enlarge diagram <Expand size={16} aria-hidden='true' />
-            </button>
-          </div>
-          <div className='carousel-system'>
-            <SystemDiagram project={project.id} />
-            <p className='architecture-summary'>{project.architecture}</p>
-          </div>
-        </article>
+        {projects.map((project, projectIndex) => (
+          <article
+            hidden={interactive && projectIndex !== index}
+            key={project.id}
+            className={`carousel-card ${direction < 0 ? 'from-left' : ''}`}
+            role={interactive ? 'group' : undefined}
+            aria-roledescription={interactive ? 'slide' : undefined}
+            aria-label={
+              interactive
+                ? `${projectIndex + 1} of ${projects.length}`
+                : undefined
+            }
+          >
+            <div className='carousel-copy'>
+              <span className='project-category'>{project.category}</span>
+              <h3>{project.title}</h3>
+              <p className='project-purpose'>{project.summary}</p>
+              <p className='project-association'>
+                Associated with <strong>{project.association}</strong>
+              </p>
+              <TechTags technologies={project.technologies} />
+              <button
+                className='text-button'
+                onClick={() => onOpen(project.id)}
+                aria-label={`Enlarge ${project.title.toLowerCase()} system diagram`}
+              >
+                Enlarge diagram <Expand size={16} aria-hidden='true' />
+              </button>
+            </div>
+            <div className='carousel-system'>
+              <SystemDiagram project={project.id} />
+              <p className='architecture-summary'>{project.architecture}</p>
+            </div>
+          </article>
+        ))}
       </div>
       <p className='carousel-progress'>
         <span>

@@ -29,7 +29,7 @@ npm run build
 npm run preview
 ```
 
-The output is in `dist/` and can be served by a static host. No server, API credentials, remote font service, or account connection is required. Configure Vite's `base` when hosting below a domain subpath.
+The build prerenders React into `dist/index.html`, then hydrates in the browser. All three project summaries, experience, and contact links are present before JavaScript runs. Without JavaScript, project cards appear as a readable stack. The temporary server bundle is removed after rendering. The output is in `dist/` and can be served by a static host. No server, API credentials, remote font service, or account connection is required. Configure Vite's `base` when hosting below a domain subpath.
 
 ## Edit the content
 
@@ -42,3 +42,18 @@ The output is in `dist/` and can be served by a static host. No server, API cred
 Company work is summarized without proprietary product names or infrastructure identifiers. Diagrams are simplified flows, not product screenshots. OpenClaw and VPS automation remain explorations. Carousel selection, enlarged diagrams, and workflow stages support `?work=analytics`, `?project=modeler`, and `?stage=review` links. Fonts and technology SVGs are bundled locally; brand marks are supplied by Simple Icons.
 
 The design brief is in `docs/portfolio/implementation-brief.md`. Reviewed design instructions and their pinned sources are in `.agents/skills/`.
+
+## SEO and the production domain
+
+The canonical URL is `https://nyassar.com/`. `index.html` contains the title, description, canonical link, social metadata, and factual Person structured data. `public/robots.txt` advertises the one-page sitemap. Interactive query links remain usable but canonicalize to the homepage.
+
+Netlify uses `netlify.toml` to build with Node 24, publish `dist`, and permanently redirect the production `nyassar.netlify.app` domain to `nyassar.com`, preserving paths and query parameters. Set `nyassar.com` as the primary domain in Netlify and verify DNS, HTTPS, and the `www` redirect in its dashboard. Deploy Previews use Netlify's automatic `X-Robots-Tag: noindex`; check that header on the preview and that it is absent from production. Branch deploys need separate indexing protection if enabled.
+
+The checked-in 1200 × 630 PNG is generated from `scripts/social-preview.html` with the local Manrope font and favicon. Regenerate after changing its source:
+
+```sh
+# Install a Playwright browser, or set PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH.
+node scripts/social-preview.mjs
+```
+
+The normal production build uses the checked-in PNG and does not require a browser. For the owner setup checklist, see [docs/portfolio/seo-setup.md](docs/portfolio/seo-setup.md).

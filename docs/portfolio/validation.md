@@ -36,3 +36,12 @@ npm run test:e2e
 ```
 
 Use `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH=/usr/bin/chromium` for the installed browser in this workspace.
+
+## SEO implementation — 9 October 2026
+
+- Production build, ESLint, Prettier checks, and `git diff --check` passed.
+- Full Playwright suite: 31 tests passed using `/opt/google/chrome/chrome`. New checks cover raw prerendered HTML, canonical and social metadata, Person structured data, sitemap/robots/image responses, hydration with query links, JavaScript-disabled layouts, and static accessibility at mobile and desktop widths. Existing interaction and WCAG checks remain passing.
+- Desktop and mobile screenshots reviewed; the existing layout, colors, and locally bundled typography remain intact. Reviewed the generated 1200 × 630 social PNG.
+- Pattern scan of all six text files in the final production output found no credential-pattern matches. No source maps or server bundle are published. This is a bounded pattern scan, not proof that every possible secret is absent.
+- `.env`, `.env.production`, `.aws/credentials`, `.codex/config.toml`, and `.serena/project.yml` are ignored by Git.
+- DNS, HTTPS, production redirects, production indexing headers, and Search Console results remain deployment-time checks. See `seo-setup.md`.
