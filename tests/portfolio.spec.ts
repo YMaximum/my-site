@@ -129,14 +129,9 @@ for (const width of [1440, 768, 390, 320]) {
       'Collaborative asset editor',
       'Data integration platform',
     ]) {
-      if (width <= 640)
-        await page
-          .getByRole('combobox', { name: 'Choose a project' })
-          .selectOption({ label: title });
-      else
-        await page
-          .getByRole('button', { name: `Show ${title.toLowerCase()}` })
-          .click();
+      await page
+        .getByRole('button', { name: `Show ${title.toLowerCase()}` })
+        .click();
       expect(
         await page.evaluate(() => document.documentElement.scrollWidth),
       ).toBeLessThanOrEqual(width);
@@ -411,17 +406,27 @@ test('mobile carousel swipes change projects while vertical gestures preserve se
   await expect(
     page.getByRole('button', { name: 'Next project', exact: true }),
   ).not.toBeVisible();
-  await expect(
-    page.getByRole('button', { name: 'Show industrial analytics platform' }),
-  ).not.toBeVisible();
-  const dropdown = page.getByRole('combobox', { name: 'Choose a project' });
-  await expect(dropdown).toHaveValue('analytics');
-  await dropdown.selectOption('modeler');
+  const analytics = page.getByRole('button', {
+    name: 'Show industrial analytics platform',
+  });
+  await expect(analytics).toBeVisible();
+  await expect(analytics).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByRole('combobox')).toHaveCount(0);
+  const buttons = page.locator('.carousel-tabs button');
+  const first = await buttons.nth(0).boundingBox();
+  const second = await buttons.nth(1).boundingBox();
+  const third = await buttons.nth(2).boundingBox();
+  expect(Math.abs(first!.y - second!.y)).toBeLessThan(1);
+  expect(third!.y).toBeGreaterThan(first!.y);
+  const modeler = page.getByRole('button', {
+    name: 'Show collaborative asset editor',
+  });
+  await modeler.click();
   await expect(slide.getByRole('heading')).toHaveText(
     'Collaborative asset editor',
   );
   await page.reload();
-  await expect(dropdown).toHaveValue('modeler');
+  await expect(modeler).toHaveAttribute('aria-pressed', 'true');
   await expect(slide.getByRole('heading')).toHaveText(
     'Collaborative asset editor',
   );

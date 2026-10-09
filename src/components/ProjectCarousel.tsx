@@ -29,7 +29,6 @@ export default function ProjectCarousel({
       aria-roledescription={interactive ? 'carousel' : undefined}
       aria-label='Company projects'
       onKeyDown={(event) => {
-        if (event.target instanceof HTMLSelectElement) return;
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
           event.preventDefault();
           const step = event.key === 'ArrowRight' ? 1 : -1;
@@ -38,24 +37,6 @@ export default function ProjectCarousel({
       }}
     >
       <div className='carousel-toolbar'>
-        <label className='carousel-select'>
-          <span className='sr-only'>Choose a project</span>
-          <select
-            value={projects[index].id}
-            onChange={(event) => {
-              const next = projects.findIndex(
-                (project) => project.id === event.target.value,
-              );
-              select(next, next >= index ? 1 : -1);
-            }}
-          >
-            {projects.map((project) => (
-              <option key={project.id} value={project.id}>
-                {project.title}
-              </option>
-            ))}
-          </select>
-        </label>
         <div className='carousel-tabs' aria-label='Choose a project'>
           {projects.map((item, i) => (
             <button

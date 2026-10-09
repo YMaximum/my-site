@@ -143,8 +143,8 @@ test('mobile diagram taps open the preview, swipe does not, and pinch zoom stays
   );
   await expect(page.getByRole('dialog')).not.toBeVisible();
   await expect(
-    page.getByRole('combobox', { name: 'Choose a project' }),
-  ).toHaveValue('analytics');
+    page.getByRole('button', { name: 'Show industrial analytics platform' }),
+  ).toHaveAttribute('aria-pressed', 'true');
   const illustration = page.getByRole('button', {
     name: 'Preview industrial analytics platform system diagram',
   });
