@@ -1,6 +1,6 @@
 # Naufal Yassar's portfolio
 
-A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A compact carousel presents three Biaenergi-associated products with short descriptions, simplified system diagrams, and colored technology logos. Experience holds contribution and infrastructure details, alongside an overall toolkit with a transparent, single-line automatic strip with faded edges on desktop and mobile; desktop logos and names are slightly larger. The dark geometric background and transitions honor system reduced-motion preferences automatically. Clicking a diagram opens a focused preview canvas with drag panning, wheel/pinch zoom, keyboard controls, fit-to-canvas, and animated connection signals. Native dialogs retain Escape, outside-click dismissal, and focus return. Mobile uses wrapping project buttons and swiping, with carousel arrows retained on desktop.
+A React portfolio about product ownership, full-stack delivery, and practical AI workflows. A compact carousel presents three Biaenergi-associated products with short descriptions, simplified system diagrams, and colored technology logos. Experience holds contribution and infrastructure details, alongside an overall toolkit with a transparent, single-line automatic strip with faded edges on desktop and mobile; desktop logos and names are slightly larger. The dark geometric background and transitions honor system reduced-motion preferences automatically. React Flow renders the diagrams using custom cards that retain the portfolio styling. Clicking a diagram opens a focused preview canvas with drag panning, wheel/pinch zoom, keyboard controls, fit-to-canvas, and React Flow animated edges. Native dialogs retain Escape, outside-click dismissal, and focus return. Mobile uses wrapping project buttons and swiping, with carousel arrows retained on desktop.
 
 ## Run locally
 
@@ -34,6 +34,7 @@ The build prerenders React into `dist/index.html`, then hydrates in the browser.
 ## Edit the content
 
 - `src/data/portfolio.ts`: profile links, project summaries, AI workflow stages, and experience.
+- `src/data/diagrams.ts`: React Flow node layouts, explicit handles, and routed connections.
 - `src/App.tsx`: page sections and navigation.
 - `src/components/`: system diagrams, technology badges, carousel, native dialog, and workflow explorer.
 - `src/index.css`: layout, design tokens, typography, and responsive styles.

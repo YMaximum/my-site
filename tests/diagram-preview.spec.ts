@@ -18,13 +18,13 @@ test('diagram preview supports pointer pan, anchored wheel zoom, keyboard contro
   await trigger.focus();
   await page.keyboard.press('Enter');
   const canvas = page.getByRole('region', { name: 'System diagram canvas' });
-  const scene = canvas.locator('.diagram-canvas-scene');
+  const scene = canvas.locator('.react-flow__viewport');
   const zoom = page.getByRole('status', { name: 'Diagram zoom' });
   await expect(canvas).toBeVisible();
   await expect(canvas).toHaveAttribute('data-lines', 'animated');
-  await expect(canvas.locator('.flow-pulse').first()).toHaveCSS(
+  await expect(canvas.locator('.react-flow__edge-path').first()).toHaveCSS(
     'animation-name',
-    'diagram-edge-travel',
+    'dashdraw',
   );
   const fitted = await scene.getAttribute('style');
   const bounds = await canvas.boundingBox();
@@ -43,7 +43,7 @@ test('diagram preview supports pointer pan, anchored wheel zoom, keyboard contro
   await page.mouse.up();
   await expect(canvas).toHaveAttribute('data-dragging', 'false');
   await expect(scene).not.toHaveAttribute('style', fitted!);
-  const node = canvas.locator('.flow-processing');
+  const node = canvas.locator('.react-flow__node[data-id="etl"]');
   const before = await node.boundingBox();
   if (!before) throw new Error('Missing node bounds');
   const initialZoom = await zoom.innerText();
@@ -76,14 +76,10 @@ test('diagram preview supports pointer pan, anchored wheel zoom, keyboard contro
     .getByRole('button', { name: 'Pause connection animation' })
     .click();
   await expect(canvas).toHaveAttribute('data-lines', 'static');
-  expect(
-    await canvas
-      .locator('.arrow-right')
-      .first()
-      .evaluate(
-        (element) => getComputedStyle(element, '::after').animationName,
-      ),
-  ).toBe('none');
+  await expect(canvas.locator('.react-flow__edge-path').first()).toHaveCSS(
+    'animation-name',
+    'none',
+  );
   await page.getByRole('button', { name: 'Play connection animation' }).click();
   await expect(canvas).toHaveAttribute('data-lines', 'animated');
   await page.emulateMedia({ reducedMotion: 'reduce' });
@@ -91,7 +87,7 @@ test('diagram preview supports pointer pan, anchored wheel zoom, keyboard contro
   await expect(
     page.getByRole('button', { name: 'Pause connection animation' }),
   ).toHaveCount(0);
-  await expect(canvas.locator('.flow-pulse').first()).not.toBeVisible();
+  await expect(canvas.locator('.react-flow__edge.animated')).toHaveCount(0);
   const zoomIn = page.getByRole('button', { name: 'Zoom in', exact: true });
   for (let i = 0; i < 12 && (await zoomIn.isEnabled()); i++)
     await zoomIn.click();
@@ -181,7 +177,7 @@ test('mobile diagram taps open the preview, swipe does not, and pinch zoom stays
     .toBeGreaterThan(initialZoom);
   await expect(canvas).toHaveAttribute('data-dragging', 'false');
   expect(await page.evaluate(() => window.scrollY)).toBe(beforeScroll);
-  const scene = canvas.locator('.diagram-canvas-scene');
+  const scene = canvas.locator('.react-flow__viewport');
   const beforePan = await scene.getAttribute('style');
   await session.send('Input.dispatchTouchEvent', {
     type: 'touchStart',
@@ -215,60 +211,88 @@ test('mobile diagram taps open the preview, swipe does not, and pinch zoom stays
 });
 
 for (const width of [1440, 390]) {
-  test(`connection signals follow solid edge paths at ${width}px`, async ({
+  test(`React Flow routes animated connections between node handles at ${width}px`, async ({
     page,
   }) => {
     await page.setViewportSize({ width, height: 1000 });
     await page.emulateMedia({ reducedMotion: 'no-preference' });
-    for (const project of ['integration', 'analytics', 'modeler']) {
+    for (const [project, count] of [
+      ['integration', 3],
+      ['analytics', 5],
+      ['modeler', 3],
+    ] as const) {
       await page.goto(`/?project=${project}`);
       const canvas = page.getByRole('region', {
         name: 'System diagram canvas',
       });
       await expect(canvas).toBeVisible();
-      await expect(canvas).toHaveAttribute('data-lines', 'animated');
-      const edges = canvas.locator('.arrow-right, .arrow-down');
+      const edges = canvas.locator('.react-flow__edge.animated');
+      await expect(edges).toHaveCount(count);
       for (const edge of await edges.all()) {
-        for (const fraction of [0.25, 0.5, 0.75]) {
-          const error = await edge.evaluate(async (node, progress) => {
-            const pulse = node.querySelector<HTMLElement>('.flow-pulse')!;
-            const animation = pulse.getAnimations()[0];
-            animation.pause();
-            animation.currentTime = 1800 * progress;
-            await new Promise(requestAnimationFrame);
-            const line = getComputedStyle(node, '::after');
-            const style = getComputedStyle(node);
-            const rect = node.getBoundingClientRect();
-            const scale = rect.width / (node as HTMLElement).offsetWidth;
-            const angle =
-              (parseFloat(style.getPropertyValue('--edge-angle')) * Math.PI) /
-              180;
-            const distance = parseFloat(line.width) * progress;
-            const x =
-              rect.x +
-              scale *
-                (parseFloat(style.borderLeftWidth) +
-                  parseFloat(line.left) +
-                  Math.cos(angle) * distance);
-            const y =
-              rect.y +
-              scale *
-                (parseFloat(style.borderTopWidth) +
-                  parseFloat(line.top) +
-                  0.5 +
-                  Math.sin(angle) * distance);
-            const dot = pulse.getBoundingClientRect();
-            return {
-              dx: Math.abs(dot.x + dot.width / 2 - x),
-              dy: Math.abs(dot.y + dot.height / 2 - y),
-              background: line.backgroundImage,
-            };
-          }, fraction);
-          expect(error.background).toBe('none');
-          expect(error.dx).toBeLessThan(1);
-          expect(error.dy).toBeLessThan(1);
+        const path = edge.locator('.react-flow__edge-path');
+        await expect(path).toHaveCSS('animation-name', 'dashdraw');
+        const attached = await edge.evaluate((element) => {
+          const path = element.querySelector<SVGPathElement>(
+            '.react-flow__edge-path',
+          )!;
+          const [sourceId, targetId] = element
+            .getAttribute('data-id')!
+            .split(
+              /-(?=(?:etl|access|analysis|storage|prepare|target|live|database)$)/,
+            );
+          const svgMatrix = path.getScreenCTM()!;
+          const endpoints = [
+            path.getPointAtLength(0),
+            path.getPointAtLength(path.getTotalLength()),
+          ].map((point) =>
+            new DOMPoint(point.x, point.y).matrixTransform(svgMatrix),
+          );
+          return [sourceId, targetId].map((id, index) => {
+            const node = element
+              .closest('.react-flow')!
+              .querySelector<HTMLElement>(
+                `.react-flow__node[data-id="${id}"]`,
+              )!;
+            const bounds = node.getBoundingClientRect();
+            const point = endpoints[index];
+            const dx = Math.max(
+              bounds.left - point.x,
+              0,
+              point.x - bounds.right,
+            );
+            const dy = Math.max(
+              bounds.top - point.y,
+              0,
+              point.y - bounds.bottom,
+            );
+            const borderDistance = Math.min(
+              Math.abs(point.x - bounds.left),
+              Math.abs(point.x - bounds.right),
+              Math.abs(point.y - bounds.top),
+              Math.abs(point.y - bounds.bottom),
+            );
+            return { dx, dy, borderDistance };
+          });
+        });
+        for (const endpoint of attached) {
+          expect(endpoint.dx).toBeLessThan(1);
+          expect(endpoint.dy).toBeLessThan(1);
+          expect(endpoint.borderDistance).toBeLessThan(1);
         }
       }
+      if (project === 'modeler') {
+        await expect(
+          canvas.locator('.react-flow__edge-path[marker-start]'),
+        ).toHaveCount(2);
+      }
+      await page
+        .getByRole('button', { name: 'Pause connection animation' })
+        .click();
+      await expect(canvas.locator('.react-flow__edge.animated')).toHaveCount(0);
+      await expect(canvas.locator('.react-flow__edge-path').first()).toHaveCSS(
+        'stroke-dasharray',
+        'none',
+      );
     }
   });
 }

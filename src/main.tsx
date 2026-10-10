@@ -1,6 +1,7 @@
 import React from 'react';
 import { createRoot, hydrateRoot } from 'react-dom/client';
 import App from './App.tsx';
+import '@xyflow/react/dist/style.css';
 import './index.css';
 
 const container = document.getElementById('root')!;
