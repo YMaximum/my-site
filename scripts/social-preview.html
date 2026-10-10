@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Naufal Yassar social preview</title>
+    <style>
+      @font-face {
+        font-family: Manrope;
+        src: url('FONT_SOURCE');
+        font-weight: 200 800;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        width: 1200px;
+        height: 630px;
+        background: #0b111d;
+        color: #edf2fa;
+        font-family: Manrope, sans-serif;
+        overflow: hidden;
+      }
+      main {
+        padding: 64px 76px;
+        position: relative;
+        height: 100%;
+      }
+      .identity {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+        font-size: 26px;
+        font-weight: 700;
+      }
+      .identity svg {
+        width: 56px;
+        height: 56px;
+      }
+      h1 {
+        font-size: 62px;
+        line-height: 1.16;
+        letter-spacing: -2.6px;
+        margin: 56px 0 24px;
+        font-weight: 750;
+      }
+      p {
+        color: #abb8cc;
+        font-size: 24px;
+        margin: 0;
+      }
+      footer {
+        position: absolute;
+        bottom: 54px;
+        left: 76px;
+        right: 76px;
+        border-top: 1px solid #2a384e;
+        padding-top: 25px;
+        display: flex;
+        justify-content: space-between;
+        font-size: 20px;
+        color: #9ab9ff;
+      }
+      .orbit {
+        position: absolute;
+        width: 440px;
+        height: 440px;
+        right: -190px;
+        top: 72px;
+        border: 1px solid #2a384e;
+        border-radius: 50%;
+      }
+      .orbit::before {
+        content: '';
+        position: absolute;
+        inset: 56px;
+        border: 1px solid #2a384e;
+        border-radius: 50%;
+      }
+      .orbit::after {
+        content: '';
+        position: absolute;
+        width: 14px;
+        height: 14px;
+        left: 12px;
+        top: 110px;
+        background: #9ab9ff;
+        border-radius: 50%;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="orbit"></div>
+      <div class="identity">FAVICON_SOURCE<span>Naufal Yassar</span></div>
+      <h1>I build products.<br />And better ways to build them.</h1>
+      <p>Full-stack Software Engineer</p>
+      <footer>
+        <span>Product ownership · Full-stack delivery · Practical AI</span
+        ><span>nyassar.com</span>
+      </footer>
+    </main>
+  </body>
+</html>

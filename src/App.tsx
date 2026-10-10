@@ -36,7 +36,12 @@ function readPageState() {
 
 export default function App() {
   const { motionEnabled } = useMotionPreference();
-  const [pageState, setPageState] = useState(readPageState);
+  const [pageState, setPageState] = useState({
+    stage: 0,
+    project: null as ProjectId | null,
+    work: 0,
+  });
+  const [interactive, setInteractive] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('');
   const [copyStatus, setCopyStatus] = useState('');
@@ -46,13 +51,30 @@ export default function App() {
     projects.find((project) => project.id === pageState.project) ?? null;
 
   useEffect(() => {
-    const target = document.getElementById(window.location.hash.slice(1));
-    if (!target) return;
-    const frame = requestAnimationFrame(() =>
-      target.scrollIntoView({ behavior: 'instant' }),
-    );
+    const frame = requestAnimationFrame(() => {
+      setPageState(readPageState());
+      setInteractive(true);
+    });
     return () => cancelAnimationFrame(frame);
   }, []);
+
+  useEffect(() => {
+    if (!interactive) return;
+    let cancelled = false;
+    let frame = 0;
+    void document.fonts.ready.then(() => {
+      if (cancelled) return;
+      frame = requestAnimationFrame(() => {
+        document
+          .getElementById(window.location.hash.slice(1))
+          ?.scrollIntoView({ behavior: 'instant' });
+      });
+    });
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(frame);
+    };
+  }, [interactive]);
 
   useEffect(() => {
     const onPopState = () => setPageState(readPageState());
@@ -127,6 +149,7 @@ export default function App() {
       id='top'
       className='portfolio'
       data-motion={motionEnabled ? 'on' : 'off'}
+      data-interactive={interactive}
     >
       <MotionEffects enabled={motionEnabled} />
       <a href='#main' className='skip-link'>
@@ -202,8 +225,8 @@ export default function App() {
         <section className='hero container' aria-labelledby='hero-title'>
           <div className='hero-main'>
             <p className='hero-context'>
-              <span className='context-dot' /> Engineering with a product
-              mindset
+              <span className='context-dot' /> Naufal Yassar — Full-stack
+              Software Engineer
             </p>
             <h1 id='hero-title'>
               I build products.
@@ -271,6 +294,7 @@ export default function App() {
             </a>
           </div>
           <ProjectCarousel
+            interactive={interactive}
             index={pageState.work}
             onChange={(work) => updatePageState({ work })}
             onOpen={openProject}

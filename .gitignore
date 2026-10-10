@@ -25,3 +25,16 @@ test-results
 *.njsproj
 *.sln
 *.sw?
+
+# Local credentials and tooling
+.env
+.env.*
+!.env.example
+.aws/
+.codex/
+.serena/
+*.pem
+*.p12
+*.pfx
+id_rsa
+id_ed25519

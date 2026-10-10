@@ -1860,11 +1860,11 @@ svg {
 @keyframes dialog-enter {
   from {
     opacity: 0;
-    transform: translateY(24px) scale(0.97);
+    transform: translateY(24px);
   }
   to {
     opacity: 1;
-    transform: translateY(0) scale(1);
+    transform: translateY(0);
   }
 }
 @keyframes backdrop-enter {
@@ -2140,11 +2140,6 @@ html:has(.portfolio[data-motion='off']) {
   font-size: 10px;
   color: var(--muted);
 }
-.flow-grid {
-  display: grid;
-  gap: 26px;
-  position: relative;
-}
 .flow-node {
   position: relative;
   border: 1px solid #435b7d;
@@ -2172,92 +2167,6 @@ html:has(.portfolio[data-motion='off']) {
   line-height: 1.6;
   color: #b6c6dc;
 }
-.arrow-right::after,
-.arrow-down::after {
-  content: '';
-  position: absolute;
-  pointer-events: none;
-  background: #809bc4;
-}
-.arrow-right::after {
-  width: 24px;
-  height: 1px;
-  left: calc(100% + 2px);
-  top: 50%;
-}
-.arrow-down::after {
-  width: 1px;
-  height: 24px;
-  top: calc(100% + 2px);
-  left: 50%;
-}
-.arrow-right::before,
-.arrow-down::before {
-  content: '';
-  position: absolute;
-  width: 5px;
-  height: 5px;
-  border-top: 1px solid #809bc4;
-  border-right: 1px solid #809bc4;
-  pointer-events: none;
-  z-index: 1;
-}
-.arrow-right::before {
-  left: calc(100% + 19px);
-  top: calc(50% - 2px);
-  transform: rotate(45deg);
-}
-.arrow-down::before {
-  top: calc(100% + 19px);
-  left: calc(50% - 2px);
-  transform: rotate(135deg);
-}
-.flow-workspace {
-  grid-area: workspace;
-}
-.flow-source {
-  grid-area: source;
-}
-.flow-processing {
-  grid-area: processing;
-}
-.flow-target {
-  grid-area: target;
-}
-.analytics-flow {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-areas: 'browser access analysis' 'source preparation storage' 'boundary boundary boundary';
-  gap: 26px;
-}
-.flow-browser {
-  grid-area: browser;
-}
-.flow-access {
-  grid-area: access;
-}
-.flow-analysis {
-  grid-area: analysis;
-}
-.flow-preparation {
-  grid-area: preparation;
-}
-.flow-storage {
-  grid-area: storage;
-}
-/* Prepared graph data feeds analysis, rather than flowing into report storage. */
-.flow-preparation.arrow-right::after {
-  width: 36px;
-  height: 1px;
-  left: calc(100% + 1px);
-  top: -1px;
-  transform: rotate(-45deg);
-  transform-origin: left center;
-}
-.flow-preparation.arrow-right::before {
-  left: calc(100% + 21px);
-  top: -25px;
-  transform: rotate(-45deg);
-}
 .flow-boundary {
   grid-area: boundary;
   font-size: 10px;
@@ -2267,31 +2176,8 @@ html:has(.portfolio[data-motion='off']) {
   border-top: 1px dashed #435b7d;
   padding-top: 12px;
 }
-.modeler-flow {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  grid-template-areas: 'client-a client-b' 'live live' 'persisted persisted';
-}
-.flow-client-a {
-  grid-area: client-a;
-}
-.flow-client-b {
-  grid-area: client-b;
-}
 .flow-live {
-  grid-area: live;
   border-color: #6586b5;
-}
-.flow-persisted {
-  grid-area: persisted;
-  justify-self: center;
-  width: 75%;
-}
-.bidirectional::after {
-  background: repeating-linear-gradient(
-    to bottom,
-    #809bc4 0 4px,
-    transparent 4px 7px
-  );
 }
 .experience-responsibilities {
   margin: 12px 0 0;
@@ -2365,9 +2251,6 @@ html:has(.portfolio[data-motion='off']) {
   .system-diagram figcaption > span {
     font-size: 9px;
   }
-  .flow-grid {
-    gap: 16px;
-  }
   .flow-node {
     padding: 9px 4px;
   }
@@ -2379,62 +2262,12 @@ html:has(.portfolio[data-motion='off']) {
     font-size: 10px;
     overflow-wrap: anywhere;
   }
-  .arrow-right::after {
-    width: 14px;
-  }
-  .arrow-right::before {
-    left: calc(100% + 9px);
-  }
-  .arrow-down::after {
-    height: 14px;
-  }
-  .arrow-down::before {
-    top: calc(100% + 9px);
-  }
-  .flow-preparation.arrow-right::after {
-    top: -1px;
-    width: 22px;
-    height: 1px;
-  }
-  .flow-preparation.arrow-right::before {
-    top: -15px;
-    left: calc(100% + 11px);
-  }
   .carousel-progress {
     font-size: 10px;
   }
   .carousel-progress > span {
     flex-shrink: 0;
   }
-}
-
-.flow-return {
-  position: absolute;
-  top: calc(100% + 3px);
-  left: calc(50% - 2px);
-  width: 5px;
-  height: 5px;
-  border-top: 1px solid #809bc4;
-  border-right: 1px solid #809bc4;
-  transform: rotate(-45deg);
-}
-.arrow-right::after,
-.arrow-down::after {
-  animation: flow-signal 3.6s ease-in-out infinite;
-}
-@keyframes flow-signal {
-  0%,
-  100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 1;
-  }
-}
-
-.integration-flow {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  grid-template-areas: '. workspace .' 'source processing target';
 }
 
 /* One transparent technology strip at every breakpoint. */
@@ -2531,5 +2364,266 @@ html:has(.portfolio[data-motion='off']) {
   .toolkit-badge svg {
     width: 18px;
     height: 18px;
+  }
+}
+
+/* Before hydration, the generated HTML remains a readable static portfolio. */
+.carousel-card[hidden] {
+  display: none;
+}
+.portfolio[data-interactive='false'] .carousel-toolbar,
+.portfolio[data-interactive='false'] .carousel-progress,
+.portfolio[data-interactive='false'] .carousel-copy button,
+.portfolio[data-interactive='false'] .menu-toggle,
+.portfolio[data-interactive='false'] .workflow-steps,
+.portfolio[data-interactive='false'] .copy-button {
+  display: none;
+}
+.portfolio[data-interactive='false'] #project-slide {
+  display: grid;
+  gap: 24px;
+}
+.portfolio[data-interactive='false'] .main-navigation {
+  position: static;
+  visibility: visible;
+  opacity: 1;
+  pointer-events: auto;
+  transform: none;
+}
+.portfolio[data-interactive='false'] *,
+.portfolio[data-interactive='false'] *::before,
+.portfolio[data-interactive='false'] *::after {
+  animation: none !important;
+}
+
+.portfolio[data-interactive='false'] .workflow {
+  grid-template-columns: 1fr;
+}
+.portfolio[data-interactive='false'] .workflow-panel {
+  border-left: 0;
+}
+
+@media (max-width: 700px) {
+  .portfolio[data-interactive='false'] .site-header {
+    position: static;
+  }
+  .portfolio[data-interactive='false'] .header-inner {
+    flex-wrap: wrap;
+    height: auto;
+    padding-block: 16px;
+    row-gap: 16px;
+  }
+  .portfolio[data-interactive='false'] .main-navigation {
+    order: 3;
+    width: 100%;
+    flex-direction: row;
+    flex-wrap: wrap;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+}
+
+/* The illustration itself opens a focused, navigable diagram preview. */
+.diagram-preview-trigger {
+  position: relative;
+}
+.diagram-open-button {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 1px solid transparent;
+  border-radius: 10px;
+  background: transparent;
+  cursor: pointer;
+}
+.diagram-open-button:hover {
+  border-color: var(--accent);
+  background: rgb(154 185 255 / 4%);
+}
+.diagram-open-button:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+}
+.portfolio[data-interactive='false'] .diagram-open-button {
+  display: none;
+}
+.mobile-carousel-hint {
+  display: none;
+}
+.carousel-progress > .desktop-carousel-hint {
+  color: var(--muted);
+}
+
+.project-dialog {
+  max-width: 1100px;
+  width: calc(100% - 32px);
+  height: min(760px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
+  overflow: hidden;
+}
+.project-dialog[open] {
+  display: flex;
+  flex-direction: column;
+}
+.project-dialog .dialog-top {
+  position: relative;
+  flex-shrink: 0;
+  gap: 16px;
+  padding: 12px 18px;
+}
+.project-dialog .dialog-top h2 {
+  font-size: 17px;
+  line-height: 1.4;
+  margin: 0;
+  letter-spacing: -0.02em;
+}
+.diagram-preview-canvas {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+.diagram-canvas-toolbar {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+}
+.diagram-canvas-toolbar output {
+  min-width: 52px;
+  text-align: center;
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+.diagram-canvas-toolbar button:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+.diagram-canvas {
+  position: relative;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  touch-action: none;
+  user-select: none;
+  cursor: grab;
+  background:
+    radial-gradient(#32445a55 1px, transparent 1px) 0 0 / 20px 20px,
+    var(--page);
+}
+.diagram-canvas[data-dragging='true'] {
+  cursor: grabbing;
+}
+.diagram-canvas:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: -3px;
+}
+.diagram-canvas .flow-node {
+  padding: 16px 10px;
+}
+.diagram-canvas .flow-node > strong {
+  font-size: 15px;
+}
+.diagram-canvas .flow-node > span {
+  font-size: 13px;
+}
+.diagram-canvas-help {
+  padding: 9px 16px;
+  border-top: 1px solid var(--line);
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  text-align: center;
+}
+@media (max-width: 640px) {
+  .carousel-arrows,
+  .desktop-carousel-hint {
+    display: none;
+  }
+  .carousel-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    width: 100%;
+  }
+  .carousel-tabs button {
+    flex: 0 0 auto;
+    width: auto;
+  }
+  .mobile-carousel-hint {
+    display: inline;
+    color: var(--muted);
+  }
+  .diagram-canvas-toolbar {
+    gap: 4px;
+    padding: 6px;
+  }
+  .project-dialog .dialog-top h2 {
+    font-size: 14px;
+  }
+  .diagram-canvas-help {
+    font-size: 10px;
+  }
+}
+.dialog-close svg,
+.diagram-canvas-toolbar button svg {
+  pointer-events: none;
+}
+.carousel-progress > .carousel-hint {
+  color: var(--muted);
+  font-variant-numeric: normal;
+}
+
+/* React Flow owns connection routing and animation; cards retain portfolio styling. */
+.flow-node {
+  width: 100%;
+  height: 100%;
+}
+.inline-system-flow {
+  position: relative;
+  width: 100%;
+  container-type: inline-size;
+}
+/* Scale the server-rendered graph as well, before browser measurement is available. */
+.inline-system-flow .react-flow__viewport {
+  transform: scale(calc(100cqw / var(--graph-width))) !important;
+}
+.inline-system-flow .react-flow__pane {
+  touch-action: auto;
+  cursor: inherit;
+}
+.system-diagram .react-flow,
+.diagram-canvas .react-flow {
+  --xy-background-color: transparent;
+  --xy-edge-stroke: #809bc4;
+  --xy-edge-stroke-width: 1.2;
+  --xy-node-background-color: #15243a;
+  --xy-node-color: var(--ink);
+}
+.react-flow__node-portfolio {
+  cursor: inherit;
+}
+.react-flow__node-portfolio .react-flow__handle {
+  width: 1px;
+  height: 1px;
+  min-width: 0;
+  min-height: 0;
+  border: 0;
+  opacity: 0;
+  pointer-events: none;
+}
+.diagram-canvas .react-flow__edge.animated path {
+  animation-duration: 1.8s;
+}
+.flow-boundary {
+  margin: 16px 0 0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.animated path {
+    animation: none !important;
+    stroke-dasharray: none;
   }
 }

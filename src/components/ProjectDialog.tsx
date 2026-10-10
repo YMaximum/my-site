@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import type { Project } from '../data/portfolio';
 import Icon from './Icons';
-import SystemDiagram from './SystemDiagram';
-import TechTags from './TechTags';
+import DiagramCanvas from './DiagramCanvas';
+import PreviewButton from './PreviewButton';
 
 function animateClose(element: HTMLDialogElement, enabled: boolean) {
   if (!element.open || element.dataset.closing) return null;
@@ -102,35 +102,20 @@ export default function ProjectDialog({
       {displayedProject && (
         <>
           <div className='dialog-top'>
-            <span className='project-category'>
-              {displayedProject.category}
-            </span>
-            <button
+            <h2 id='case-study-title'>{displayedProject.title}</h2>
+            <PreviewButton
               className='icon-button dialog-close'
-              aria-label='Close system diagram'
-              onClick={requestClose}
+              label='Close system diagram'
+              onActivate={requestClose}
             >
               <Icon name='X' size={22} />
-            </button>
+            </PreviewButton>
           </div>
-          <div className='dialog-content'>
-            <h2 id='case-study-title'>{displayedProject.title}</h2>
-            <p className='dialog-summary'>{displayedProject.summary}</p>
-            <p className='project-association'>
-              Associated with {displayedProject.association}
-            </p>
-            <SystemDiagram project={displayedProject.id} />
-            <div className='case-study-section'>
-              <h3>System flow</h3>
-              <p>{displayedProject.architecture}</p>
-            </div>
-            <TechTags technologies={displayedProject.technologies} />
-            <div className='dialog-actions'>
-              <button className='text-button' onClick={requestClose}>
-                Back to selected work <Icon name='ArrowRight' size={17} />
-              </button>
-            </div>
-          </div>
+          <DiagramCanvas
+            key={displayedProject.id}
+            project={displayedProject.id}
+            motionEnabled={motionEnabled}
+          />
         </>
       )}
     </dialog>

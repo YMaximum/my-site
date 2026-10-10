@@ -1,21 +1,23 @@
 import { useRef, useState } from 'react';
-import { ArrowLeft, ArrowRight, Expand } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from 'lucide-react';
 import { projects, type ProjectId } from '../data/portfolio';
 import SystemDiagram from './SystemDiagram';
 import TechTags from './TechTags';
 
 export default function ProjectCarousel({
   index,
+  interactive,
   onChange,
   onOpen,
 }: {
   index: number;
+  interactive: boolean;
   onChange: (index: number) => void;
   onOpen: (id: ProjectId) => void;
 }) {
   const [direction, setDirection] = useState(1);
   const touchStart = useRef<{ x: number; y: number } | null>(null);
-  const project = projects[index];
+  const suppressOpen = useRef(false);
   function select(next: number, direction: number) {
     setDirection(direction);
     onChange((next + projects.length) % projects.length);
@@ -24,7 +26,7 @@ export default function ProjectCarousel({
     <div
       className='project-carousel'
       role='region'
-      aria-roledescription='carousel'
+      aria-roledescription={interactive ? 'carousel' : undefined}
       aria-label='Company projects'
       onKeyDown={(event) => {
         if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
@@ -72,6 +74,7 @@ export default function ProjectCarousel({
         aria-live='polite'
         aria-atomic='true'
         onTouchStart={(event) => {
+          suppressOpen.current = false;
           touchStart.current = {
             x: event.touches[0].clientX,
             y: event.touches[0].clientY,
@@ -86,45 +89,64 @@ export default function ProjectCarousel({
           if (!start) return;
           const dx = event.changedTouches[0].clientX - start.x;
           const dy = event.changedTouches[0].clientY - start.y;
-          if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5)
+          if (Math.abs(dx) > 60 && Math.abs(dx) > Math.abs(dy) * 1.5) {
+            suppressOpen.current = true;
             select(index + (dx < 0 ? 1 : -1), dx < 0 ? 1 : -1);
+          }
         }}
       >
-        <article
-          key={project.id}
-          className={`carousel-card ${direction < 0 ? 'from-left' : ''}`}
-          role='group'
-          aria-roledescription='slide'
-          aria-label={`${index + 1} of ${projects.length}`}
-        >
-          <div className='carousel-copy'>
-            <span className='project-category'>{project.category}</span>
-            <h3>{project.title}</h3>
-            <p className='project-purpose'>{project.summary}</p>
-            <p className='project-association'>
-              Associated with <strong>{project.association}</strong>
-            </p>
-            <TechTags technologies={project.technologies} />
-            <button
-              className='text-button'
-              onClick={() => onOpen(project.id)}
-              aria-label={`Enlarge ${project.title.toLowerCase()} system diagram`}
-            >
-              Enlarge diagram <Expand size={16} aria-hidden='true' />
-            </button>
-          </div>
-          <div className='carousel-system'>
-            <SystemDiagram project={project.id} />
-            <p className='architecture-summary'>{project.architecture}</p>
-          </div>
-        </article>
+        {projects.map((project, projectIndex) => (
+          <article
+            hidden={interactive && projectIndex !== index}
+            key={project.id}
+            className={`carousel-card ${direction < 0 ? 'from-left' : ''}`}
+            role={interactive ? 'group' : undefined}
+            aria-roledescription={interactive ? 'slide' : undefined}
+            aria-label={
+              interactive
+                ? `${projectIndex + 1} of ${projects.length}`
+                : undefined
+            }
+          >
+            <div className='carousel-copy'>
+              <span className='project-category'>{project.category}</span>
+              <h3>{project.title}</h3>
+              <p className='project-purpose'>{project.summary}</p>
+              <p className='project-association'>
+                Associated with <strong>{project.association}</strong>
+              </p>
+              <TechTags technologies={project.technologies} />
+            </div>
+            <div className='carousel-system'>
+              <div className='diagram-preview-trigger'>
+                <SystemDiagram project={project.id} />
+                <button
+                  className='diagram-open-button'
+                  aria-label={`Preview ${project.title.toLowerCase()} system diagram`}
+                  aria-haspopup='dialog'
+                  onClick={(event) => {
+                    if (event.detail === 0 || !suppressOpen.current)
+                      onOpen(project.id);
+                  }}
+                />
+              </div>
+              <p className='architecture-summary'>{project.architecture}</p>
+            </div>
+          </article>
+        ))}
       </div>
       <p className='carousel-progress'>
         <span>
           {String(index + 1).padStart(2, '0')} /{' '}
           {String(projects.length).padStart(2, '0')}
         </span>{' '}
-        Company products · Use arrows or swipe to explore
+        <span className='carousel-hint'>
+          Company products ·{' '}
+          <span className='desktop-carousel-hint'>
+            Use arrows or swipe to explore
+          </span>
+          <span className='mobile-carousel-hint'>Swipe to explore</span>
+        </span>
       </p>
     </div>
   );
