@@ -22,6 +22,10 @@ npm run test:e2e
 
 The browser suite checks carousel selection and deep links, keyboard and swipe navigation, animated dismissal, outside-click and drag behavior, visible canvas controls, keyboard focus, all workflow stages and navigation controls, exact section-divider alignment across breakpoints, updated employment dates, email copying and its failure path, responsive overflow, motion preferences, single-line toolkit autoplay, reduced-motion keyboard scrolling, edge fades, and automated WCAG A/AA checks. Tests run against a production preview. If Chromium is already installed, set `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH` to its absolute path instead of downloading another browser.
 
+GitHub's Verify workflow targets an isolated self-hosted Linux X64 runner with the `nyassar-portfolio` label. It runs on pushes to `main`, same-repository pull requests, and manual dispatch. It uses Node 24 and one Playwright worker to leave VPS resource headroom. Chromium OS libraries belong in the runner image; the job installs the browser without sudo and downloads it into the job's temporary directory. Checkout credentials are not retained.
+
+External fork PRs are excluded from this runner. Keep the repository's fork-workflow approval policy set to **all external contributors**, since contributors can propose changes to workflow files themselves. The repository includes `.github/actionlint.yaml` so `actionlint` recognizes the dedicated runner label. Provisioning and registering a healthy runner is required before these jobs can execute.
+
 ## Build and host
 
 ```sh
