@@ -213,3 +213,62 @@ test('mobile diagram taps open the preview, swipe does not, and pinch zoom stays
   await expect(page.getByRole('dialog')).not.toBeVisible();
   expect(errors).toEqual([]);
 });
+
+for (const width of [1440, 390]) {
+  test(`connection signals follow solid edge paths at ${width}px`, async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    for (const project of ['integration', 'analytics', 'modeler']) {
+      await page.goto(`/?project=${project}`);
+      const canvas = page.getByRole('region', {
+        name: 'System diagram canvas',
+      });
+      await expect(canvas).toBeVisible();
+      await expect(canvas).toHaveAttribute('data-lines', 'animated');
+      const edges = canvas.locator('.arrow-right, .arrow-down');
+      for (const edge of await edges.all()) {
+        for (const fraction of [0.25, 0.5, 0.75]) {
+          const error = await edge.evaluate(async (node, progress) => {
+            const pulse = node.querySelector<HTMLElement>('.flow-pulse')!;
+            const animation = pulse.getAnimations()[0];
+            animation.pause();
+            animation.currentTime = 1800 * progress;
+            await new Promise(requestAnimationFrame);
+            const line = getComputedStyle(node, '::after');
+            const style = getComputedStyle(node);
+            const rect = node.getBoundingClientRect();
+            const scale = rect.width / (node as HTMLElement).offsetWidth;
+            const angle =
+              (parseFloat(style.getPropertyValue('--edge-angle')) * Math.PI) /
+              180;
+            const distance = parseFloat(line.width) * progress;
+            const x =
+              rect.x +
+              scale *
+                (parseFloat(style.borderLeftWidth) +
+                  parseFloat(line.left) +
+                  Math.cos(angle) * distance);
+            const y =
+              rect.y +
+              scale *
+                (parseFloat(style.borderTopWidth) +
+                  parseFloat(line.top) +
+                  0.5 +
+                  Math.sin(angle) * distance);
+            const dot = pulse.getBoundingClientRect();
+            return {
+              dx: Math.abs(dot.x + dot.width / 2 - x),
+              dy: Math.abs(dot.y + dot.height / 2 - y),
+              background: line.backgroundImage,
+            };
+          }, fraction);
+          expect(error.background).toBe('none');
+          expect(error.dx).toBeLessThan(1);
+          expect(error.dy).toBeLessThan(1);
+        }
+      }
+    }
+  });
+}

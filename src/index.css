@@ -2172,24 +2172,31 @@ html:has(.portfolio[data-motion='off']) {
   line-height: 1.6;
   color: #b6c6dc;
 }
+/* The connection line and traveling dot share one path geometry. */
+.arrow-right,
+.arrow-down {
+  --edge-x: calc(100% + 2px);
+  --edge-y: 50%;
+  --edge-length: 24px;
+  --edge-angle: 0deg;
+}
+.arrow-down {
+  --edge-x: 50%;
+  --edge-y: calc(100% + 2px);
+  --edge-angle: 90deg;
+}
 .arrow-right::after,
 .arrow-down::after {
   content: '';
   position: absolute;
   pointer-events: none;
   background: #809bc4;
-}
-.arrow-right::after {
-  width: 24px;
+  width: var(--edge-length);
   height: 1px;
-  left: calc(100% + 2px);
-  top: 50%;
-}
-.arrow-down::after {
-  width: 1px;
-  height: 24px;
-  top: calc(100% + 2px);
-  left: 50%;
+  left: var(--edge-x);
+  top: var(--edge-y);
+  transform: rotate(var(--edge-angle));
+  transform-origin: left center;
 }
 .arrow-right::before,
 .arrow-down::before {
@@ -2245,13 +2252,11 @@ html:has(.portfolio[data-motion='off']) {
   grid-area: storage;
 }
 /* Prepared graph data feeds analysis, rather than flowing into report storage. */
-.flow-preparation.arrow-right::after {
-  width: 36px;
-  height: 1px;
-  left: calc(100% + 1px);
-  top: -1px;
-  transform: rotate(-45deg);
-  transform-origin: left center;
+.flow-preparation.arrow-right {
+  --edge-x: calc(100% + 1px);
+  --edge-y: -1px;
+  --edge-length: 36px;
+  --edge-angle: -45deg;
 }
 .flow-preparation.arrow-right::before {
   left: calc(100% + 21px);
@@ -2285,13 +2290,6 @@ html:has(.portfolio[data-motion='off']) {
   grid-area: persisted;
   justify-self: center;
   width: 75%;
-}
-.bidirectional::after {
-  background: repeating-linear-gradient(
-    to bottom,
-    #809bc4 0 4px,
-    transparent 4px 7px
-  );
 }
 .experience-responsibilities {
   margin: 12px 0 0;
@@ -2379,22 +2377,18 @@ html:has(.portfolio[data-motion='off']) {
     font-size: 10px;
     overflow-wrap: anywhere;
   }
-  .arrow-right::after {
-    width: 14px;
+  .arrow-right,
+  .arrow-down {
+    --edge-length: 14px;
   }
   .arrow-right::before {
     left: calc(100% + 9px);
   }
-  .arrow-down::after {
-    height: 14px;
-  }
   .arrow-down::before {
     top: calc(100% + 9px);
   }
-  .flow-preparation.arrow-right::after {
-    top: -1px;
-    width: 22px;
-    height: 1px;
+  .flow-preparation.arrow-right {
+    --edge-length: 22px;
   }
   .flow-preparation.arrow-right::before {
     top: -15px;
@@ -2725,21 +2719,18 @@ html:has(.portfolio[data-motion='off']) {
 .diagram-canvas .flow-node > span {
   font-size: 13px;
 }
-.diagram-canvas .arrow-right::after {
-  width: 24px;
+.diagram-canvas .arrow-right,
+.diagram-canvas .arrow-down {
+  --edge-length: 24px;
 }
 .diagram-canvas .arrow-right::before {
   left: calc(100% + 19px);
 }
-.diagram-canvas .arrow-down::after {
-  height: 24px;
-}
 .diagram-canvas .arrow-down::before {
   top: calc(100% + 19px);
 }
-.diagram-canvas .flow-preparation.arrow-right::after {
-  width: 36px;
-  top: -1px;
+.diagram-canvas .flow-preparation.arrow-right {
+  --edge-length: 36px;
 }
 .diagram-canvas .flow-preparation.arrow-right::before {
   left: calc(100% + 21px);
@@ -2761,27 +2752,13 @@ html:has(.portfolio[data-motion='off']) {
   position: absolute;
   pointer-events: none;
   z-index: 2;
-  width: 6px;
-  height: 2px;
+  width: 4px;
+  height: 4px;
   background: var(--accent);
-  border-radius: 2px;
-  left: calc(100% + 2px);
-  top: calc(50% - 1px);
-  --edge-distance: 18px;
-  --edge-angle: 0deg;
-  transform-origin: left center;
+  border-radius: 50%;
+  left: var(--edge-x);
+  top: calc(var(--edge-y) + 0.5px);
   animation: diagram-edge-travel 1.8s linear infinite;
-}
-.diagram-canvas[data-lines='animated'] .arrow-down .flow-pulse {
-  left: calc(50% - 1px);
-  top: calc(100% + 2px);
-  --edge-angle: 90deg;
-}
-.diagram-canvas[data-lines='animated'] .flow-preparation .flow-pulse {
-  left: calc(100% + 1px);
-  top: -2px;
-  --edge-angle: -45deg;
-  --edge-distance: 30px;
 }
 .diagram-canvas[data-lines='static'] *,
 .diagram-canvas[data-lines='static'] *::before,
@@ -2791,7 +2768,7 @@ html:has(.portfolio[data-motion='off']) {
 @keyframes diagram-edge-travel {
   0% {
     opacity: 0;
-    transform: rotate(var(--edge-angle)) translateX(0);
+    transform: translate(-50%, -50%) rotate(var(--edge-angle)) translateX(0);
   }
   20%,
   80% {
@@ -2799,7 +2776,8 @@ html:has(.portfolio[data-motion='off']) {
   }
   100% {
     opacity: 0;
-    transform: rotate(var(--edge-angle)) translateX(var(--edge-distance));
+    transform: translate(-50%, -50%) rotate(var(--edge-angle))
+      translateX(var(--edge-length));
   }
 }
 @media (prefers-reduced-motion: reduce) {
