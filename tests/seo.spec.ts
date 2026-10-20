@@ -20,6 +20,10 @@ test('production HTML contains portfolio content and consistent SEO metadata', a
     expect(html).toContain(project.title);
     expect(html).toContain(project.summary);
   }
+  expect(html).toContain('Last Spire – The Runeforged Age');
+  expect(html).toContain('A personal assistant on WhatsApp');
+  expect(html).toContain('daily reports');
+  expect(html).toContain('cash-flow tracking');
   await page.goto('/?work=analytics&stage=review');
   await expect(page).toHaveTitle(
     'Naufal Yassar — Full-stack Software Engineer',
@@ -63,6 +67,42 @@ test('production HTML contains portfolio content and consistent SEO metadata', a
   const png = await preview.body();
   expect(png.readUInt32BE(16)).toBe(1200);
   expect(png.readUInt32BE(20)).toBe(630);
+});
+
+test('search icons are declared in HTML and served as real image files', async ({
+  page,
+  request,
+}) => {
+  await page.goto('/');
+  for (const [path, size, rel] of [
+    ['/favicon-96x96.png', 96, 'icon'],
+    ['/apple-touch-icon.png', 180, 'apple-touch-icon'],
+  ] as const) {
+    await expect(
+      page.locator(`link[rel="${rel}"][href="${path}"]`),
+    ).toHaveAttribute('sizes', `${size}x${size}`);
+    const response = await request.get(path);
+    expect(response.status()).toBe(200);
+    expect(response.headers()['content-type']).toContain('image/png');
+    const image = await response.body();
+    expect(image.subarray(0, 8)).toEqual(
+      Buffer.from([137, 80, 78, 71, 13, 10, 26, 10]),
+    );
+    expect(image.readUInt32BE(16)).toBe(size);
+    expect(image.readUInt32BE(20)).toBe(size);
+  }
+  await expect(
+    page.locator('link[rel="icon"][href="/favicon.ico"]'),
+  ).toHaveCount(1);
+  const icon = await request.get('/favicon.ico');
+  expect(icon.status()).toBe(200);
+  expect(icon.headers()['content-type']).toMatch(
+    /image\/(?:x-icon|vnd\.microsoft\.icon)/,
+  );
+  const ico = await icon.body();
+  expect(ico.readUInt16LE(0)).toBe(0);
+  expect(ico.readUInt16LE(2)).toBe(1);
+  expect(ico.readUInt16LE(4)).toBe(2);
 });
 
 test('prerendered deep links hydrate without browser errors', async ({
@@ -112,6 +152,19 @@ for (const width of [390, 1440]) {
           page.getByRole('heading', { name: project.title, exact: true }),
         ).toBeVisible();
       }
+      const personal = page.getByRole('region', { name: 'Built beyond work' });
+      await expect(
+        personal.getByRole('link', { name: 'Play Last Spire' }),
+      ).toHaveAttribute('href', 'https://last-spire.nyassar.com/');
+      await expect(
+        personal.getByRole('link', { name: 'Source code' }),
+      ).toHaveAttribute('href', 'https://github.com/YMaximum/last-spire');
+      await expect(
+        personal.getByRole('heading', {
+          name: 'A personal assistant on WhatsApp',
+        }),
+      ).toBeVisible();
+      await expect(personal.getByText('Deployed & in use')).toBeVisible();
       await expect(
         page.getByRole('heading', { name: 'Biaenergi' }),
       ).toHaveCount(2);
