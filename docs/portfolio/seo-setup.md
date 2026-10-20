@@ -14,3 +14,7 @@ These steps follow production deployment of the SEO branch. DNS and live redirec
 Production must not send a `noindex` meta tag or `X-Robots-Tag` header. Netlify Deploy Previews normally send `X-Robots-Tag: noindex`; verify it on the review preview. If branch deploys are enabled, protect those separately because they do not receive the same automatic exclusion.
 
 Sources: [Netlify domain management](https://docs.netlify.com/domains/manage-domains/manage-multiple-domains/), [Google domain verification](https://support.google.com/webmasters/answer/34592?hl=en), [Google URL Inspection](https://support.google.com/webmasters/answer/9012289?hl=en), [Netlify previews](https://docs.netlify.com/deploy/deploy-types/deploy-previews/).
+
+## Search-result favicon
+
+After deploying the icon update, open `https://nyassar.com/favicon-96x96.png` and `https://nyassar.com/favicon.ico` to confirm real image responses. Keep these URLs stable and crawlable by Googlebot-Image; the homepage must remain crawlable by Googlebot. Use Search Console URL Inspection on `https://nyassar.com/` and request indexing after the update is live. Google can take days or weeks to recrawl and process the homepage and favicon, and a correct setup does not guarantee display. See [Google's favicon guidance](https://developers.google.com/search/docs/appearance/favicon-in-search).

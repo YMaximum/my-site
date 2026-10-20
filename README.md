@@ -44,13 +44,15 @@ The build prerenders React into `dist/index.html`, then hydrates in the browser.
 - `src/index.css`: layout, design tokens, typography, and responsive styles.
 - `index.html` and `public/favicon.svg`: metadata and site identity.
 
-Company work is summarized without proprietary product names or infrastructure identifiers. Diagrams are simplified flows, not product screenshots. OpenClaw and VPS automation remain explorations. Carousel selection, enlarged diagrams, and workflow stages support `?work=analytics`, `?project=modeler`, and `?stage=review` links. Fonts and technology SVGs are bundled locally; brand marks are supplied by Simple Icons.
+Company work is summarized without proprietary product names or infrastructure identifiers. Diagrams are simplified flows, not product screenshots. The personal-project section links to Last Spire, a free browser tower-defense roguelite built with Codex, and its public source repository. It also describes the deployed OpenClaw WhatsApp assistant for daily reports and personal cash-flow tracking without exposing private conversations, financial records, or VPS identifiers. Carousel selection, enlarged diagrams, and workflow stages support `?work=analytics`, `?project=modeler`, and `?stage=review` links. Fonts and technology SVGs are bundled locally; brand marks are supplied by Simple Icons.
 
 The design brief is in `docs/portfolio/implementation-brief.md`. Reviewed design instructions and their pinned sources are in `.agents/skills/`.
 
 ## SEO and the production domain
 
 The canonical URL is `https://nyassar.com/`. `index.html` contains the title, description, canonical link, social metadata, and factual Person structured data. `public/robots.txt` advertises the one-page sitemap. Interactive query links remain usable but canonicalize to the homepage.
+
+The existing SVG monogram also has checked-in 96px PNG, multi-size ICO, and 180px Apple touch icon variants, declared in the initial HTML. Regenerate them after changing `public/favicon.svg` with `node scripts/favicons.mjs` (requires Playwright Chromium, or `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`). The normal build uses the checked-in images without launching a browser. Google must recrawl the homepage and icon before search results can update; display is not guaranteed.
 
 Netlify uses `netlify.toml` to build with Node 24, publish `dist`, and permanently redirect the production `nyassar.netlify.app` domain to `nyassar.com`, preserving paths and query parameters. Set `nyassar.com` as the primary domain in Netlify and verify DNS, HTTPS, and the `www` redirect in its dashboard. Deploy Previews use Netlify's automatic `X-Robots-Tag: noindex`; check that header on the preview and that it is absent from production. Branch deploys need separate indexing protection if enabled.
 

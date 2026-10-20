@@ -719,6 +719,7 @@ svg {
   align-items: flex-start;
 }
 .exploring-grid article > svg {
+  flex-shrink: 0;
   color: #acbdd8;
   margin-top: 1px;
 }
@@ -743,6 +744,18 @@ svg {
   border: 1px solid #3a4e6c;
   border-radius: 4px;
   background: #0b111d;
+}
+
+.personal-project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  margin-top: 14px;
+}
+
+.personal-project-links .text-link {
+  min-height: 44px;
+  font-size: 12px;
 }
 
 /* Contact */

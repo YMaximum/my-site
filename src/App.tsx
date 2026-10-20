@@ -412,31 +412,50 @@ export default function App() {
               <Icon name='Sparkles' size={21} />
             </span>
             <div>
-              <h2 id='exploring-title'>On my workbench</h2>
-              <p>Things I'm learning and exploring next.</p>
+              <h2 id='exploring-title'>Built beyond work</h2>
+              <p>
+                Personal projects, from browser games to everyday automation.
+              </p>
             </div>
           </div>
           <div className='exploring-grid' data-reveal>
             <article>
-              <Icon name='Network' size={22} />
+              <Icon name='Gamepad2' size={22} />
               <div>
-                <h3>AI that connects to real work</h3>
+                <h3>Last Spire – The Runeforged Age</h3>
                 <p>
-                  Exploring OpenClaw and scoped access to company resources, so
-                  information is easier for the team to reach.
+                  A free browser tower-defense roguelite. Build an arcane tower,
+                  choose upgrades, and survive the next wave. I built it with
+                  Codex using TypeScript and Canvas, with progress saved locally
+                  in the browser.
                 </p>
-                <span className='exploration-status'>Exploring</span>
+                <div className='personal-project-links'>
+                  <a
+                    href='https://last-spire.nyassar.com/'
+                    className='text-link'
+                  >
+                    Play Last Spire <Icon name='ArrowUpRight' size={16} />
+                  </a>
+                  <a
+                    href='https://github.com/YMaximum/last-spire'
+                    className='text-link'
+                  >
+                    Source code <Icon name='Github' size={16} />
+                  </a>
+                </div>
               </div>
             </article>
             <article>
-              <Icon name='Server' size={22} />
+              <Icon name='MessageCircle' size={22} />
               <div>
-                <h3>A small home for automation</h3>
+                <h3>A personal assistant on WhatsApp</h3>
                 <p>
-                  Setting up a VPS as a place to learn and experiment with
-                  useful daily automations.
+                  I deployed OpenClaw on my VPS and connected a personal
+                  assistant to WhatsApp. It supports my daily reports and
+                  personal cash-flow tracking, bringing useful automations into
+                  a conversation I can reach from my phone.
                 </p>
-                <span className='exploration-status'>Learning & planning</span>
+                <span className='exploration-status'>Deployed & in use</span>
               </div>
             </article>
           </div>
